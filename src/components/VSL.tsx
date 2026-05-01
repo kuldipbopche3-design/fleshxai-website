@@ -89,7 +89,7 @@ export default function VSL() {
           viewport={{ once: true }}
           className="font-serif text-4xl md:text-5xl lg:text-6xl mb-6 mx-auto leading-tight"
         >
-          Stop Wasting Ad Spend on <span className="text-white/50 italic">Low-Quality</span> Content.
+          Stop Running Ads on <span className="text-white/50 italic">Creatives That Don't Convert.</span>
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -98,7 +98,7 @@ export default function VSL() {
           transition={{ delay: 0.2 }}
           className="text-lg md:text-xl font-light text-white/70 max-w-2xl mx-auto mb-16"
         >
-          Real growth comes from strategic, data-backed 3D product visuals and highly authentic UGC ads. Watch how we do it.
+          High-converting ads aren't luck — they're built. See how we combine 3D product visuals and authentic UGC to maximize ROAS for D2C brands.
         </motion.p>
         
         {/* VSL Player Container */}
@@ -139,19 +139,19 @@ export default function VSL() {
             <div className="text-5xl md:text-7xl font-sans font-black text-[#D9F059] mb-4 drop-shadow-[0_0_20px_rgba(217,240,89,0.2)] tracking-tighter">
               <AnimatedCounter prefix="$" end={10} suffix="M+" />
             </div>
-            <div className="text-xs md:text-sm uppercase tracking-[0.2em] font-medium text-white/60">Generated For Clients</div>
+            <div className="text-xs md:text-sm uppercase tracking-[0.2em] font-medium text-white/60">Ad Spend Managed For Clients</div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
             <div className="text-5xl md:text-7xl font-sans font-black text-white mb-4 tracking-tighter">
               <AnimatedCounter end={500} suffix="+" />
             </div>
-            <div className="text-xs md:text-sm uppercase tracking-[0.2em] font-medium text-white/60">Videos Delivered</div>
+            <div className="text-xs md:text-sm uppercase tracking-[0.2em] font-medium text-white/60">Views Generated</div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
             <div className="text-5xl md:text-7xl font-sans font-black text-[#D9F059] mb-4 drop-shadow-[0_0_20px_rgba(217,240,89,0.2)] tracking-tighter">
               <AnimatedCounter end={40} suffix="%" />
             </div>
-            <div className="text-xs md:text-sm uppercase tracking-[0.2em] font-medium text-white/60">Decrease In CPA</div>
+            <div className="text-xs md:text-sm uppercase tracking-[0.2em] font-medium text-white/60">Avg ROAS Increase</div>
           </motion.div>
         </div>
 

@@ -3,21 +3,21 @@ import { Play, Sparkles } from 'lucide-react';
 
 const services = [
   {
-    title: 'Authentic UGC Videos',
-    description: 'Relatable, scroll-stopping content created by our curated network of beauty enthusiasts. We handle the scripting, sourcing, and editing to deliver ready-to-run ads that blend seamlessly into the feed.',
+    title: 'UGC Ads That Convert',
+    description: 'Authentic, human-driven content that builds trust and drives purchases. We handle casting, scripting, and editing — delivering feed-native ads that feel real, not produced.',
     icon: Play,
-    image: '/portfolio_ugc_1.png',
-    tag: 'Community Driven',
+    image: '/portfolio_ugc_1.webp',
+    tag: 'Trust-Driven',
     gradient: 'from-[#FFCBE3]/40 to-[#FFF0F5]/80',
     iconBg: 'bg-[#FF1A75]/10',
     iconColor: 'text-[#FF1A75]'
   },
   {
-    title: 'Premium AI 3D Ads',
-    description: 'Impossible camera angles, surreal environments, and flawless lighting. We leverage cutting-edge AI and 3D modeling to showcase your cosmetics in ways traditional photography simply cannot match.',
+    title: '3D Product Visuals',
+    description: 'Hyper-realistic visuals that make your product impossible to scroll past. Flawless lighting, cinematic angles, and surreal environments — built to capture attention and hold it.',
     icon: Sparkles,
-    image: '/portfolio_3d_2.png',
-    tag: 'Next-Gen Visuals',
+    image: '/portfolio_3d_2.webp',
+    tag: 'Next-Gen Creative',
     gradient: 'from-[#D9F059]/30 to-[#EAF5A4]/80',
     iconBg: 'bg-[#b6cd23]/20',
     iconColor: 'text-[#8b9e14]'
@@ -34,7 +34,7 @@ export default function Services() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <h2 className="font-serif text-4xl md:text-5xl mb-6">Our Expertise</h2>
+          <h2 className="font-serif text-4xl md:text-5xl mb-6">What We Build</h2>
           <motion.div
             initial={{ height: 0 }}
             whileInView={{ height: 64 }}

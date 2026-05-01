@@ -4,22 +4,22 @@ import { Clock, TrendingUp, BarChart2 } from 'lucide-react';
 const benefits = [
   {
     icon: Clock,
-    title: 'Lightning Fast Delivery',
-    description: 'We know trends move quickly. Receive fully edited, ad-account ready content in just 5-7 business days.',
+    title: 'Ad-Ready in 5-7 Days',
+    description: 'Speed matters in paid media. Get fully edited, platform-ready creatives delivered fast — no revisions, no delays, no excuses.',
     bg: 'bg-[#000000]',
     iconColor: 'text-[#d114e1]'
   },
   {
     icon: BarChart2,
-    title: 'Data-Driven Direction',
-    description: 'Every script and storyboard is engineered based on proven direct-response marketing frameworks and competitor analysis.',
+    title: 'Built on Direct-Response',
+    description: 'Every hook, script, and storyboard is engineered from proven D2C frameworks and live competitor data — not guesswork.',
     bg: 'bg-[#000000]',
     iconColor: 'text-[#0e10eb]'
   },
   {
     icon: TrendingUp,
     title: 'Engineered for ROAS',
-    description: 'We don’t just make things look pretty. We optimize for hook rates, hold rates, and ultimate conversion.',
+    description: 'We don’t decorate ads — we engineer them. Every creative is optimized for hook rate, hold rate, and revenue, not just impressions.',
     bg: 'bg-[#000000]',
     iconColor: 'text-[#442bfa]'
   }
@@ -31,7 +31,7 @@ export default function Trust() {
       <div
         className="absolute inset-0 w-full h-full pointer-events-none"
         style={{
-          backgroundImage: 'url("/beauty_hero_bg.png")',
+          backgroundImage: 'url("/beauty_hero_bg.webp")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           mixBlendMode: 'soft-light',
@@ -56,8 +56,8 @@ export default function Trust() {
               transition={{ delay: 0.2, duration: 0.8 }}
               className="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight"
             >
-              Aesthetics meet <br />
-              <span className="italic font-light text-ink/70">Performance.</span>
+              We don't just create content — <br />
+              <span className="italic font-light text-ink/70">we engineer performance.</span>
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -66,7 +66,7 @@ export default function Trust() {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-lg font-light text-ink/80 leading-relaxed max-w-md"
             >
-              The beauty industry is fiercely competitive. You need more than just good lighting—you need content that builds trust, explains the value, and drives action immediately.
+              Paid ads only work when the creative does. We combine 3D product visuals and authentic UGC to build trust, communicate value, and drive action — in the first 2 seconds.
             </motion.p>
           </motion.div>
 

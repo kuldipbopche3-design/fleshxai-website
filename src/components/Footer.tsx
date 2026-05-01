@@ -11,13 +11,13 @@ export default function Footer() {
             Elevating D2C beauty brands through high-converting UGC and breathtaking 3D product visuals.
           </p>
           <div className="flex gap-4">
-            <a href="#" className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-white hover:text-ink transition-colors">
+            <a href="https://www.instagram.com/flesh_and_flow" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-white hover:text-ink transition-colors">
               <Instagram className="w-4 h-4" />
             </a>
             <a href="#" className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-white hover:text-ink transition-colors">
               <Twitter className="w-4 h-4" />
             </a>
-            <a href="#" className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-white hover:text-ink transition-colors">
+            <a href="https://www.linkedin.com/in/kuldeep-bopche" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center hover:bg-white hover:text-ink transition-colors">
               <Linkedin className="w-4 h-4" />
             </a>
           </div>

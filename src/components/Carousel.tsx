@@ -120,7 +120,7 @@ export default function Carousel() {
             >
               <video 
                 autoPlay
-                preload="auto"
+                preload="none"
                 loop 
                 muted 
                 playsInline 

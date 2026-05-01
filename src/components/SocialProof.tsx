@@ -5,25 +5,25 @@ const testimonials = [
     quote: "Aura completely transformed our ad creatives. The 3D and UGC split-testing reduced our CPA by 42% in the first month.",
     author: "Sarah L.",
     role: "CMO, Glow Botanica",
-    avatar: "/avatar_1.png"
+    avatar: "/avatar_1.webp"
   },
   {
     quote: "We struggled to get high-quality UGC that actually converted. Aura's creators were authentic and the scripts were data-backed. True professionals.",
     author: "Jessica M.",
     role: "Founder, Bare Skin",
-    avatar: "/avatar_2.png"
+    avatar: "/avatar_2.webp"
   },
   {
     quote: "The speed and quality of delivery are unmatched. Our ROAS has doubled since we started using FleshxAI's creative frameworks.",
     author: "Michael T.",
     role: "Director of Growth, Lumen",
-    avatar: "/avatar_3.png"
+    avatar: "/avatar_3.webp"
   },
   {
     quote: "Finally, a team that understands direct-response within the beauty niche. Highly recommend to any brand looking to scale.",
     author: "Emma W.",
     role: "Marketing Head, Verve",
-    avatar: "/avatar_4.png"
+    avatar: "/avatar_4.webp"
   }
 ];
 
@@ -41,7 +41,7 @@ export default function SocialProof() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <p className="text-xs uppercase tracking-[0.2em] font-medium mb-8 text-[#060606]">Trusted By Industry Leaders</p>
+          <p className="text-xs uppercase tracking-[0.2em] font-medium mb-8 text-[#060606]">Trusted by brands scaling revenue with performance-driven creatives</p>
           <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale">
             {/* Using text placeholders instead of images for brands for a clean look */}
             <span className="font-serif text-2xl">LUMIÈRE</span>

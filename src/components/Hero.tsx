@@ -27,7 +27,7 @@ export default function Hero() {
       <div
         className="absolute inset-0 w-full h-full z-0 pointer-events-none"
         style={{
-          backgroundImage: 'url("/beauty_hero_bg.png")',
+          backgroundImage: 'url("/beauty_hero_bg.webp")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           mixBlendMode: 'normal'
@@ -43,11 +43,11 @@ export default function Hero() {
         className="max-w-4xl mx-auto relative z-10"
       >
         <motion.div variants={itemVariants} className="text-xs uppercase tracking-[0.2em] mb-8 h-[20px] w-[329px] text-[#ffffff] font-bold bg-[#ffc0e9] rounded-[50px] pl-0 pt-[3px] mx-auto">
-          The Future of Beauty Marketing
+          Performance Creatives for D2C Brands
         </motion.div>
 
-        <motion.h1 variants={itemVariants} className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.1] md:leading-[1.05] tracking-tight mb-8 text-[#ff00fb]">
-          Scale Your <Highlight><span className="italic font-light pr-2 text-[#8e4848]">D2C Beauty Brand</span></Highlight> <br className="hidden md:block" /> with High-Converting Content.
+        <motion.h1 variants={itemVariants} className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.1] md:leading-[1.05] tracking-tight mb-8">
+          <span style={{ color: '#605f60' }}>We Create Ads That </span><Highlight><span className="italic font-light pr-2 text-[#8e4848]">Actually Convert.</span></Highlight>
         </motion.h1>
 
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mt-12 w-full max-w-lg mx-auto">
@@ -57,7 +57,7 @@ export default function Hero() {
             href="#call"
             className="w-full sm:w-auto px-8 py-5 bg-ink text-white rounded-full text-xs uppercase tracking-[0.15em] font-medium shadow-[0_0_40px_-5px_rgba(0,0,0,0.3)] hover:shadow-[0_0_50px_-5px_rgba(0,0,0,0.5)] hover:bg-ink-light transition-all flex items-center justify-center"
           >
-            Get a Free Content Audit
+            Get Your First Ad Concept
           </motion.a>
           <motion.a
             whileHover={{ scale: 1.05, backgroundColor: 'rgba(5.9%, 5.5%, 6.3%, 0.05)' }}
@@ -65,7 +65,7 @@ export default function Hero() {
             href="#work"
             className="w-full sm:w-auto px-8 py-5 bg-transparent border border-ink/20 text-ink rounded-full text-xs uppercase tracking-[0.15em] font-medium hover:border-ink/40 transition-all flex items-center justify-center"
           >
-            View Our Work
+            See Real Results
           </motion.a>
         </motion.div>
       </motion.div>

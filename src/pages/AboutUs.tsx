@@ -11,7 +11,7 @@ export default function AboutUs() {
           <div className="w-full md:w-1/2 flex flex-col items-center md:items-end">
             <div className="relative group rounded-[24px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] transition-transform duration-500 ease-out hover:scale-[1.025]">
               <img 
-                src="/myimg.png" 
+                src="/myimg.webp" 
                 alt="Kuldeep - Founder, FleshxAI" 
                 className="w-full max-w-sm object-cover rounded-[24px]"
               />

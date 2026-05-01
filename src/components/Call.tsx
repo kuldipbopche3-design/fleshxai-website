@@ -37,12 +37,12 @@ export default function Call() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <div className="text-[10px] uppercase tracking-[0.2em] font-medium text-cream/50 mb-6">Start Your Project</div>
+            <div className="text-[10px] uppercase tracking-[0.2em] font-medium text-cream/50 mb-6">Turn Ads Into Revenue</div>
             <h2 className="font-serif text-5xl md:text-7xl leading-[1.15] mb-8">
-              Let's create something <Highlight color="#D9F059"><span className="italic font-light px-2">extraordinary.</span></Highlight>
+              Ready to turn your ads into <Highlight color="#D9F059"><span className="italic font-light px-2">revenue?</span></Highlight>
             </h2>
             <p className="text-lg font-light text-cream/70 mb-12 max-w-md leading-relaxed mt-4">
-              Book a free strategy session to discuss how we can increase your ROAS with high-performing UGC and 3D visual assets.
+              Let's build your next high-converting campaign. Book a free strategy call and we'll map out exactly how to maximize your ROAS with 3D visuals and UGC.
             </p>
 
             <div className="space-y-6">
@@ -108,7 +108,7 @@ export default function Call() {
                 rel="noopener noreferrer"
                 className="w-full mt-8 py-5 bg-cream text-ink text-xs uppercase tracking-[0.2em] font-medium rounded-full hover:bg-blush hover:shadow-[0_0_30px_rgba(255,192,233,0.3)] transition-all flex justify-center items-center gap-3 group"
               >
-                Request Audit
+                Book a Call
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </motion.a>
             </motion.form>

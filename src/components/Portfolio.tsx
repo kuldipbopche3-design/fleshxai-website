@@ -2,10 +2,10 @@ import { motion } from 'motion/react';
 import { PlayCircle } from 'lucide-react';
 
 const works = [
-  { id: 1, type: 'UGC', image: '/portfolio_ugc_1.png' },
-  { id: 2, type: '3D Render', image: '/portfolio_3d_1.png' },
-  { id: 3, type: 'UGC', image: '/portfolio_ugc_2.png' },
-  { id: 4, type: '3D Render', image: '/portfolio_3d_2.png' },
+  { id: 1, type: 'UGC', image: '/portfolio_ugc_1.webp' },
+  { id: 2, type: '3D Render', image: '/portfolio_3d_1.webp' },
+  { id: 3, type: 'UGC', image: '/portfolio_ugc_2.webp' },
+  { id: 4, type: '3D Render', image: '/portfolio_3d_2.webp' },
 ];
 
 const containerVariants = {

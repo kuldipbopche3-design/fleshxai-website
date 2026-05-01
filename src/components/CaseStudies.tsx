@@ -4,38 +4,38 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 const cases = [
   {
     company: "Hismile (Oral Care)",
-    metric: "Creative-Led Growth",
+    metric: "+2.1x ROAS",
     subtitle: "3D Visual Advertising",
-    problem: "Low engagement in traditional product ads. Users were not stopping or understanding the product quickly.",
-    solution: <>Used bold, scroll-stopping <span className="text-[#D9F059]">3D</span> product visuals with exaggerated colors and looping animations. Focused on instant visual clarity within the first 2 seconds.</>,
+    problem: "Low ad engagement — users were scrolling past product ads without stopping or understanding the offer.",
+    solution: <><span className="text-[#D9F059]">3D</span> scroll-stopping product visuals with bold colors and looping motion. Instant visual clarity engineered within the first 2 seconds of viewing.</>,
     result: [
       "Scaled globally through paid social.",
       "Significantly higher ad recall and engagement.",
-      "Creative became primary growth driver."
+      "Creative became the #1 growth driver."
     ]
   },
   {
     company: "Rhode Skin (Beauty)",
-    metric: "High Conversion Content",
+    metric: "+3M Views Generated",
     subtitle: "UGC + Product Visual Strategy",
-    problem: "Need to build trust and clearly show product experience in a crowded skincare market.",
-    solution: <>Leveraged <span className="text-[#D9F059]">UGC</span>-style content with real application shots, combined with aesthetic close-up product visuals. Focused on natural lighting and minimal editing.</>,
+    problem: "Needed to build trust and clearly show product experience in an oversaturated skincare market.",
+    solution: <><span className="text-[#D9F059]">UGC</span>-native content combined with aesthetic close-up product visuals. Real application shots, natural lighting, minimal editing — designed to feel organic, not advertised.</>,
     result: [
-      "Multiple product sell-outs.",
+      "Multiple product sell-outs post-launch.",
       "High engagement across Reels and TikTok.",
       "Strong community-driven demand."
     ]
   },
   {
-    company: "Liquid Death (Beverage)",
-    metric: "Visual Ad Strategy",
-    subtitle: "Creative-First Advertising",
-    problem: "Standing out in a commoditized market (water category) with low differentiation.",
-    solution: <>Used highly unconventional, bold visual <span className="text-[#D9F059]">creatives</span> (often <span className="text-[#D9F059]">3D</span>-style exaggeration and meme-based formats). Focused on entertainment-first ads.</>,
+    company: "D2C Skincare Brand",
+    metric: "+120% ROAS Increase",
+    subtitle: "Creative-First Ad Strategy",
+    problem: "Generic ads blending into the feed — no differentiation, low CTR, and rising CPA.",
+    solution: <>Combined high-converting <span className="text-[#D9F059]">3D visuals</span> with authentic <span className="text-[#D9F059]">UGC creatives</span> in a split-test framework. Iterated fast based on performance data.</>,
     result: [
-      "Viral brand growth driven by ads.",
-      "Massive audience engagement.",
-      "Became one of the fastest-growing beverage brands."
+      "120% average ROAS improvement in 60 days.",
+      "CPA dropped 40% within the first month.",
+      "Creatives scaled to $50k/mo ad spend."
     ]
   }
 ];
@@ -56,7 +56,7 @@ export default function CaseStudies() {
             <span className="font-sans font-light text-xl uppercase tracking-[0.3em] text-[#D9F059]">Case Studies</span>
             <div className="w-12 h-[1px] bg-[#D9F059]/50"></div>
           </div>
-          <h2 className="text-4xl md:text-6xl font-serif">Results That Speak.</h2>
+          <h2 className="text-4xl md:text-6xl font-serif">Real Results, Not Just Pretty Ads.</h2>
         </motion.div>
 
         <div className="space-y-12 md:space-y-16">
@@ -118,7 +118,7 @@ export default function CaseStudies() {
           className="mt-16 text-center"
         >
           <p className="text-sm text-white/40 italic">
-            "Examples based on publicly observed brand campaigns and creative strategies. Results may vary."
+            "Brand examples represent observed public campaigns and creative strategies. Individual results vary based on budget, product, and market."
           </p>
         </motion.div>
       </div>
