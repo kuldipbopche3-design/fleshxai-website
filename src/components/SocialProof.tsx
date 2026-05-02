@@ -68,7 +68,7 @@ export default function SocialProof() {
                 {test.quote}
               </p>
               <div className="flex items-center gap-4">
-                <img src={test.avatar} alt={test.author} className="w-12 h-12 rounded-full object-cover" />
+                <img src={test.avatar} alt={test.author} loading="lazy" decoding="async" className="w-12 h-12 rounded-full object-cover" />
                 <div>
                   <div className="font-bold text-[#ffffff] text-sm">{test.author}</div>
                   <div className="text-xs text-[#ffffff]/60 uppercase tracking-wider">{test.role}</div>

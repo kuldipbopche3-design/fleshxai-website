@@ -30,7 +30,7 @@ export default function Nav() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  const baseLinks = ['Services', 'Work', 'Trust', 'Pricing'];
+  const baseLinks = ['Services', 'Work', 'Campaigns', 'Trust', 'Pricing'];
   const links = location.pathname === '/about' ? ['Home', ...baseLinks] : ['About Us', ...baseLinks];
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, item: string) => {
@@ -79,18 +79,20 @@ export default function Nav() {
         {/* Desktop Nav */}
         <motion.nav
           animate={{
-            backgroundColor: scrolled ? 'rgba(253, 251, 247, 0.95)' : 'rgba(253, 251, 247, 0)',
-            backdropFilter: scrolled ? 'blur(16px)' : 'none',
-            boxShadow: scrolled ? '0 10px 40px -10px rgba(0,0,0,0.1)' : 'none',
+            backgroundColor: scrolled ? 'rgba(253, 251, 247, 0.95)' : 'rgba(10, 10, 10, 0)',
+            backdropFilter: scrolled ? 'blur(20px)' : 'none',
+            boxShadow: scrolled ? '0 10px 40px -10px rgba(0,0,0,0.15)' : 'none',
             padding: scrolled ? '12px 24px' : '16px 24px',
             borderRadius: scrolled ? '100px' : '0px',
             width: scrolled ? 'auto' : '100%',
-            border: scrolled ? '1px solid rgba(26,26,26,0.05)' : '1px solid transparent'
+            border: scrolled ? '1px solid rgba(26,26,26,0.08)' : '1px solid transparent',
+            color: scrolled ? '#1A1A1A' : '#FDFBF7',
           }}
-          transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.5 }}
+          transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.45 }}
+          style={{ willChange: 'transform, background-color, color' }}
           className="hidden md:flex relative items-center justify-between w-full max-w-7xl mx-auto pointer-events-auto"
         >
-          <Link to="/" className="text-xl md:text-2xl font-serif font-bold mr-8 focus:outline-none shrink-0" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/" className="text-xl md:text-2xl font-serif font-bold mr-8 focus:outline-none shrink-0 transition-colors duration-300" style={{ textDecoration: 'none', color: 'inherit' }}>
             FleshxAI
           </Link>
 

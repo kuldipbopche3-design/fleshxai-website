@@ -36,9 +36,14 @@ export default function Footer() {
           <div>
             <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-cream/40 mb-6">Contact</h4>
             <ul className="space-y-4 text-sm font-light text-cream/80">
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                <a href="mailto:bopchekuldeep1@gmail.com" className="hover:text-white transition-colors">bopchekuldeep1@gmail.com</a>
+              <li className="flex items-start gap-2">
+                <Mail className="w-4 h-4 mt-0.5 shrink-0" />
+                <a
+                  href="mailto:bopchekuldeep1@gmail.com"
+                  className="hover:text-white transition-colors break-all leading-snug"
+                >
+                  bopchekuldeep1@gmail.com
+                </a>
               </li>
               <li>Seoni, Madhya Pradesh</li>
             </ul>

@@ -14,9 +14,11 @@ const assets = [
   { type: 'UGC', badge: 'Lifestyle', src: '/video11.mp4' },
 ];
 
-// Duplicate items to ensure enough width for continuous infinity
-// Using 14 items prevents exceeding the browser's simultaneous video playback limit (~16 videos)
+// Duplicate items for seamless infinite loop
 const items = [...assets, ...assets].slice(0, 14);
+
+// Threshold: how close to center (in px) before we load+play a video
+const LOAD_THRESHOLD = 900;
 
 export default function Carousel() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,61 +28,88 @@ export default function Carousel() {
   useEffect(() => {
     let animationFrameId: number;
     let scrollOffset = 0;
-    
+
     const animate = () => {
       const isMobile = window.innerWidth < 768;
-      const CARD_WIDTH = isMobile ? 220 : 280; 
+      const CARD_WIDTH = isMobile ? 220 : 280;
       const CARD_HEIGHT = CARD_WIDTH * (16 / 9);
       const GAP = isMobile ? 20 : 30;
-      const SPACING = CARD_WIDTH + GAP; 
+      const SPACING = CARD_WIDTH + GAP;
       const TOTAL_WIDTH = items.length * SPACING;
-      
-      // Control the steepness of the arc (increased to allow wrapping with fewer items)
+
       const a = isMobile ? 0.0003 : 0.0002;
 
       if (!isPaused.current) {
-        scrollOffset += 2.0; // Increased speed
+        scrollOffset += 2.0;
         if (scrollOffset >= TOTAL_WIDTH) {
           scrollOffset -= TOTAL_WIDTH;
         }
       }
-      
+
       cardsRef.current.forEach((card, i) => {
         if (!card) return;
-        
+
         let x = (i * SPACING - scrollOffset) % TOTAL_WIDTH;
         if (x < 0) x += TOTAL_WIDTH;
-        
-        // Map x to [-TOTAL_WIDTH/2, TOTAL_WIDTH/2] to center the parabola
+
         x -= TOTAL_WIDTH / 2;
-        
+
         const y = a * x * x;
         const angleRad = Math.atan(2 * a * x);
         const angleDeg = angleRad * (180 / Math.PI);
-        
+
         card.style.width = `${CARD_WIDTH}px`;
         card.style.height = `${CARD_HEIGHT}px`;
         card.style.transform = `translate3d(${x - CARD_WIDTH / 2}px, ${y}px, 0) rotate(${angleDeg}deg)`;
 
-        // Smart Play/Pause to fix browser video decoder limit (blank screens)
-        // Only play videos that are reasonably close to the center of the screen
-        const isVisible = x > -1500 && x < 1500;
-        if (card.dataset.visible !== String(isVisible)) {
-          card.dataset.visible = String(isVisible);
-          const videoEl = card.querySelector('video');
-          if (videoEl) {
-            if (isVisible) {
-              const playPromise = videoEl.play();
-              if (playPromise !== undefined) {
-                playPromise.catch(() => {});
-              }
-            } else {
-              videoEl.pause();
-            }
+        // PERFORMANCE FIX: Use a tighter threshold for actual play, and a wider
+        // threshold for src loading. Completely unload videos that are far off-screen.
+        const absX = Math.abs(x);
+        const shouldPlay = absX < LOAD_THRESHOLD;
+        const shouldLoad = absX < LOAD_THRESHOLD * 1.8; // pre-load slightly wider zone
+
+        const videoEl = card.querySelector('video') as HTMLVideoElement | null;
+        if (!videoEl) return;
+
+        const prevLoaded = card.dataset.loaded;
+        const prevVisible = card.dataset.visible;
+
+        // Manage src loading/unloading to free GPU decoder slots
+        if (shouldLoad && prevLoaded !== 'true') {
+          card.dataset.loaded = 'true';
+          const itemSrc = items[i].src;
+          if (videoEl.getAttribute('data-src') && videoEl.src !== itemSrc) {
+            videoEl.src = itemSrc;
+            videoEl.load();
           }
+        } else if (!shouldLoad && prevLoaded !== 'false') {
+          card.dataset.loaded = 'false';
+          if (!videoEl.paused) videoEl.pause();
+          // Free the decoder slot completely
+          videoEl.src = '';
+          videoEl.load();
+        }
+
+        // Manage play/pause within the loaded zone
+        if (shouldPlay && prevVisible !== 'true') {
+          card.dataset.visible = 'true';
+          if (videoEl.src && videoEl.readyState >= 2) {
+            const playPromise = videoEl.play();
+            if (playPromise !== undefined) playPromise.catch(() => {});
+          } else if (videoEl.src) {
+            // Wait for it to be ready then play
+            videoEl.oncanplay = () => {
+              const pp = videoEl.play();
+              if (pp !== undefined) pp.catch(() => {});
+            };
+          }
+        } else if (!shouldPlay && prevVisible !== 'false') {
+          card.dataset.visible = 'false';
+          videoEl.oncanplay = null;
+          if (!videoEl.paused) videoEl.pause();
         }
       });
-      
+
       animationFrameId = requestAnimationFrame(animate);
     };
 
@@ -103,7 +132,7 @@ export default function Carousel() {
         </motion.div>
       </div>
 
-      <div 
+      <div
         ref={containerRef}
         className="relative w-full h-[450px] md:h-[600px] flex justify-center text-[#ac8f8f]"
       >
@@ -118,17 +147,16 @@ export default function Carousel() {
                 transformOrigin: 'center center'
               }}
             >
-              <video 
-                autoPlay
+              {/* Video element: src is managed dynamically by the RAF loop */}
+              <video
+                data-src={item.src}
                 preload="none"
-                loop 
-                muted 
-                playsInline 
+                loop
+                muted
+                playsInline
                 className="w-full h-full object-cover"
-              >
-                <source src={item.src} type="video/mp4" />
-              </video>
-              
+              />
+
               <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent flex flex-col justify-end p-5 md:p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="flex items-center justify-between">
                   <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full text-[9px] md:text-[10px] uppercase font-bold text-ink tracking-[0.2em] shadow-sm">

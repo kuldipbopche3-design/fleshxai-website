@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,500;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -13,22 +12,27 @@
   --color-ink-light: #4A4A4A;
 }
 
-html, body {
+/* html: smooth scroll anchor + hide horizontal overflow */
+html {
+  scroll-behavior: smooth;
   overflow-x: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
+html::-webkit-scrollbar {
   display: none;
 }
 
+/* body: clip horizontal overflow, NOT transform (breaks scroll container + fixed positioning) */
 body {
+  overflow-x: hidden;
   font-family: var(--font-sans);
   background-color: var(--color-cream);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -48,8 +52,334 @@ h1, h2, h3, h4, h5, h6 {
   animation: marquee 15s linear infinite;
   display: flex;
   width: max-content;
+  /* PERFORMANCE: hint browser to promote to its own GPU layer */
+  will-change: transform;
 }
 
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* PERFORMANCE: Pure CSS spin animations for VSL decorative SVGs.
+   Unlike Framer Motion JS animations, CSS animations run on the 
+   compositor thread and don't block the main thread. */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes spin-slow-reverse {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 24s linear infinite;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-slow-reverse 30s linear infinite;
+}
+
+/* Respect user's reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-spin-slow,
+  .animate-spin-slow-reverse {
+    animation: none;
+  }
+}
+
+/* ─── Video Gallery ──────────────────────────────────────────── */
+.video-gallery-section {
+  padding: 6rem 1.5rem 8rem;
+  background: #000;
+  color: #FDFBF7;
+}
+
+.video-gallery-container {
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+/* Header */
+.video-gallery-header {
+  margin-bottom: 4rem;
+}
+
+.video-gallery-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.video-gallery-eyebrow span {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #D9F059;
+}
+
+.video-gallery-eyebrow-line {
+  width: 3rem;
+  height: 1px;
+  background: rgba(217, 240, 89, 0.5);
+}
+
+.video-gallery-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.08;
+  color: #FDFBF7;
+  margin-bottom: 1rem;
+}
+
+.video-gallery-title--accent {
+  color: #D9F059;
+}
+
+.video-gallery-subtitle {
+  font-size: 1rem;
+  color: rgba(253,251,247,0.45);
+  font-family: var(--font-sans);
+  font-weight: 300;
+}
+
+/* Grid */
+.video-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .video-gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .video-gallery-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Card */
+.video-gallery-card {
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #111;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s cubic-bezier(0.22,1,0.36,1);
+  aspect-ratio: 9/16;
+}
+
+.video-gallery-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(217,240,89,0.18);
+}
+
+.video-gallery-card__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.video-gallery-card__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+
+.video-gallery-card:hover .video-gallery-card__video {
+  transform: scale(1.04);
+}
+
+.video-gallery-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.75) 0%,
+    rgba(0,0,0,0.1) 50%,
+    rgba(0,0,0,0.3) 100%
+  );
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.video-gallery-card__play-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.video-gallery-card__play-btn > svg {
+  filter: drop-shadow(0 2px 12px rgba(0,0,0,0.6));
+}
+
+/* Circular play button */
+.video-gallery-card__play-btn::before {
+  content: '';
+  position: absolute;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: rgba(217, 240, 89, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(217, 240, 89, 0.5);
+}
+
+.video-gallery-card__mute-btn {
+  position: absolute;
+  bottom: 3rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.video-gallery-card__mute-btn:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.video-gallery-card__label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem 1rem;
+  pointer-events: none;
+}
+
+.video-gallery-card__brand {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(253,251,247,0.7);
+  font-weight: 500;
+}
+
+
+/* ─── About — Social Cards ───────────────────────────────────── */
+.about-social-card {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 2px;                      /* space for the border */
+  background: rgba(255,255,255,0.04);
+  text-decoration: none;
+  display: block;
+  transition: box-shadow 0.35s cubic-bezier(0.22,1,0.36,1);
+  cursor: pointer;
+}
+
+/* Gradient border layer (hidden by default, revealed on hover) */
+.about-social-card__border {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.25rem;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 0;
+}
+
+.about-social-card:hover .about-social-card__border {
+  opacity: 1;
+}
+
+.about-social-card:hover {
+  box-shadow: 0 24px 48px rgba(0,0,0,0.55);
+}
+
+/* Inner card surface (sits above the border) */
+.about-social-card__inner {
+  position: relative;
+  z-index: 1;
+  background: #111113;
+  border-radius: 1.15rem;
+  padding: 1.75rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: background 0.3s ease;
+}
+
+.about-social-card:hover .about-social-card__inner {
+  background: #161618;
+}
+
+/* Icon bubble */
+.about-social-card__icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem;
+  flex-shrink: 0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.about-social-card__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.about-social-card:hover .about-social-card__icon {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transform: scale(1.08);
+}
+
+/* Platform name */
+.about-social-card__platform {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(253,251,247,0.9);
+  letter-spacing: 0.02em;
+}
+
+/* Handle */
+.about-social-card__handle {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: rgba(253,251,247,0.38);
+  letter-spacing: 0.04em;
+  margin-top: 0.25rem;
+}
+
+/* Arrow link indicator */
+.about-social-card__arrow {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  color: rgba(253,251,247,0.5);
+  display: flex;
+  align-items: center;
+}
+
+

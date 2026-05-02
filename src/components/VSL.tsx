@@ -14,11 +14,8 @@ function AnimatedCounter({ end, duration = 2.5, prefix = "", suffix = "" }: { en
           const step = (timestamp: number) => {
             if (!startTime) startTime = timestamp;
             const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
-            
-            // easeOutExpo for a fast start and slow satisfying finish
             const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
             setCount(Math.floor(easeProgress * end));
-            
             if (progress < 1) {
               requestAnimationFrame(step);
             } else {
@@ -45,6 +42,34 @@ function AnimatedCounter({ end, duration = 2.5, prefix = "", suffix = "" }: { en
 export default function VSL() {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // PERFORMANCE FIX: Only autoplay the VSL video when it's actually visible on screen.
+  // This prevents a 3.5 MB video from decoding before the user scrolls to it.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Assign src lazily, then play
+          if (!video.src || video.src === window.location.href) {
+            video.src = '/video7.mp4';
+            video.load();
+          }
+          const playPromise = video.play();
+          if (playPromise !== undefined) playPromise.catch(() => {});
+        } else {
+          if (!video.paused) video.pause();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleVideoClick = () => {
     if (videoRef.current) {
@@ -60,30 +85,22 @@ export default function VSL() {
   };
 
   return (
-    <section className="py-24 md:py-32 px-6 bg-[#0B0D14] text-white relative overflow-hidden" id="vsl">
-      {/* Decorative sparks/starbursts */}
-      <motion.div 
-        animate={{ rotate: 360 }}
-        transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
-        className="absolute top-20 right-[5%] md:right-[15%] opacity-80 z-0"
-      >
+    <section ref={sectionRef} className="py-24 md:py-32 px-6 bg-[#0B0D14] text-white relative overflow-hidden" id="vsl">
+      {/* Decorative sparks — using CSS animation instead of Framer Motion to avoid JS overhead */}
+      <div className="absolute top-20 right-[5%] md:right-[15%] opacity-80 z-0 animate-spin-slow">
         <svg width="84" height="84" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M32 0L35.4328 22.8687L54.6274 7.37258L42.277 28.5672L64 32L42.277 35.4328L54.6274 56.6274L35.4328 41.1313L32 64L28.5672 41.1313L9.37258 56.6274L21.723 35.4328L0 32L21.723 28.5672L9.37258 7.37258L28.5672 22.8687L32 0Z" fill="#D9F059"/>
         </svg>
-      </motion.div>
+      </div>
 
-      <motion.div 
-        animate={{ rotate: -360 }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-40 left-[2%] md:left-[8%] opacity-60 scale-75 z-0"
-      >
+      <div className="absolute bottom-40 left-[2%] md:left-[8%] opacity-60 scale-75 z-0 animate-spin-slow-reverse">
         <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M32 0L35.4328 22.8687L54.6274 7.37258L42.277 28.5672L64 32L42.277 35.4328L54.6274 56.6274L35.4328 41.1313L32 64L28.5672 41.1313L9.37258 56.6274L21.723 35.4328L0 32L21.723 28.5672L9.37258 7.37258L28.5672 22.8687L32 0Z" fill="#d90467"/>
         </svg>
-      </motion.div>
+      </div>
 
       <div className="max-w-5xl mx-auto relative z-10 text-center">
-        <motion.h2 
+        <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -100,7 +117,7 @@ export default function VSL() {
         >
           High-converting ads aren't luck — they're built. See how we combine 3D product visuals and authentic UGC to maximize ROAS for D2C brands.
         </motion.p>
-        
+
         {/* VSL Player Container */}
         <motion.div
            initial={{ opacity: 0, scale: 0.95, y: 40 }}
@@ -110,14 +127,14 @@ export default function VSL() {
            className="relative w-full aspect-video rounded-[24px] md:rounded-[32px] overflow-hidden bg-black shadow-2xl shadow-black/80 border border-white/10 group cursor-pointer mb-20"
            onClick={handleVideoClick}
         >
-          <video 
+          {/* PERFORMANCE FIX: src is set lazily by IntersectionObserver above */}
+          <video
             ref={videoRef}
-            src="/video7.mp4" 
-            autoPlay 
-            loop 
+            loop
             muted={isMuted}
             playsInline
-            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" 
+            preload="none"
+            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
           />
           {isMuted && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -163,7 +180,7 @@ export default function VSL() {
           transition={{ delay: 0.4 }}
           className="inline-block p-[3px] rounded-[16px] bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-600 shadow-[0_0_20px_rgba(56,189,248,0.5)] hover:shadow-[0_0_30px_rgba(56,189,248,0.7)] hover:-translate-y-1 transition-all duration-300"
         >
-          <a 
+          <a
             href="https://calendly.com/kuldipbopche3/30min"
             target="_blank"
             rel="noopener noreferrer"

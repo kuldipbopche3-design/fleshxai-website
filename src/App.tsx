@@ -8,6 +8,7 @@ import Services from './components/Services';
 import Trust from './components/Trust';
 import Portfolio from './components/Portfolio';
 import CaseStudies from './components/CaseStudies';
+import VideoGallery from './components/VideoGallery';
 import SocialProof from './components/SocialProof';
 import Call from './components/Call';
 import Footer from './components/Footer';
@@ -44,6 +45,7 @@ function Home() {
         <Trust />
         <Portfolio />
         <CaseStudies />
+        <VideoGallery />
         <Pricing />
         <SocialProof />
         <Call />
