@@ -5,7 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/AI-Voice-Agent-Wabsight/',
+    base: './',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
