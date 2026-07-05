@@ -155,8 +155,12 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
             <div className="absolute inset-0 bg-gradient-to-tr from-brand-950/20 via-transparent to-transparent pointer-events-none" />
             <div className="space-y-6 relative">
               {/* Founder Avatar */}
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-brand-600 to-sky-400 flex items-center justify-center text-white shadow-xl shadow-brand-600/10">
-                <span className="font-display font-extrabold text-2xl tracking-wide">KB</span>
+              <div className="w-24 h-24 rounded-2xl overflow-hidden border border-slate-800 shadow-xl shadow-brand-600/10 bg-slate-950">
+                <img 
+                  src="/MyImg.png" 
+                  alt="Kuldip Bopche" 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
               </div>
               <div className="space-y-1">
                 <h3 className="font-display text-xl font-bold text-white">Kuldip Bopche</h3>
