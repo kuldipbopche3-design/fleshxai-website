@@ -172,7 +172,7 @@ export default function Navbar({
                   : "text-slate-305 hover:text-white"
               }`}
             >
-              Testimonials
+              Portfolio
             </button>
             <button
               onClick={() => navigateToPage("about")}
@@ -293,7 +293,7 @@ export default function Navbar({
                   : "text-slate-305 hover:text-white hover:bg-slate-800"
               }`}
             >
-              Testimonials
+              Portfolio
             </button>
             <button
               onClick={() => navigateToPage("about")}

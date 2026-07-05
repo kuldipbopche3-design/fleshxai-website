@@ -131,7 +131,7 @@ export default function Footer({ onBookDemoClick, setCurrentPage }: FooterProps)
                   onClick={(e) => handlePageClick(e, "testimonials")} 
                   className="hover:text-white transition-colors font-semibold text-brand-400"
                 >
-                  Client Testimonials
+                  Our Portfolio
                 </a>
               </li>
               <li>
