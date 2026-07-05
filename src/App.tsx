@@ -13,8 +13,11 @@ import CaseScenarios from "./components/CaseScenarios";
 import FAQ from "./components/FAQ";
 import BookingForm from "./components/BookingForm";
 import Footer from "./components/Footer";
+import TestimonialsPage from "./components/TestimonialsPage";
+import AboutUsPage from "./components/AboutUsPage";
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState<"home" | "testimonials" | "about">("home");
   const [scrollPercent, setScrollPercent] = useState(0);
 
   useEffect(() => {
@@ -56,7 +59,37 @@ export default function App() {
     document.documentElement.style.setProperty('--scrollbar-color', brandColor);
   }, [scrollPercent]);
 
+  // Handle redirect + scroll on page routing transitions
+  useEffect(() => {
+    if (currentPage === "home") {
+      const target = sessionStorage.getItem("scrollTarget");
+      if (target) {
+        sessionStorage.removeItem("scrollTarget");
+        const timer = setTimeout(() => {
+          const element = document.getElementById(target);
+          if (element) {
+            const offset = 80;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - offset;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth"
+            });
+          }
+        }, 150); // delay to let Home DOM settle
+        return () => clearTimeout(timer);
+      }
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [currentPage]);
+
   const handleScrollToBooking = () => {
+    if (currentPage !== "home") {
+      sessionStorage.setItem("scrollTarget", "booking");
+      setCurrentPage("home");
+      return;
+    }
     const bookingSection = document.getElementById("booking");
     if (bookingSection) {
       const offset = 80; // account for sticky navbar
@@ -70,6 +103,11 @@ export default function App() {
   };
 
   const handleScrollToInteractiveDemo = () => {
+    if (currentPage !== "home") {
+      sessionStorage.setItem("scrollTarget", "interactive-demo");
+      setCurrentPage("home");
+      return;
+    }
     const demoSection = document.getElementById("interactive-demo");
     if (demoSection) {
       const offset = 100; // offset
@@ -88,49 +126,66 @@ export default function App() {
       <Navbar 
         onBookDemoClick={handleScrollToBooking} 
         onInteractiveDemoClick={handleScrollToInteractiveDemo}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
       />
 
-      {/* Main Core View Modules */}
+      {/* Main Content Render Modules */}
       <main>
-        {/* A. Hero Section with Interactive Live Telephone Simulator */}
-        <Hero onBookDemoClick={handleScrollToBooking} />
+        {currentPage === "home" && (
+          <>
+            {/* A. Hero Section with Interactive Live Telephone Simulator */}
+            <Hero onBookDemoClick={handleScrollToBooking} />
 
-        {/* B. Problem Section (The Silent Revenue Leak Stats) */}
-        <ProblemSection />
+            {/* B. Problem Section (The Silent Revenue Leak Stats) */}
+            <ProblemSection />
 
-        {/* C. Solution Section (Introducing Sam, the step-by-step call flow) */}
-        <SolutionSection />
+            {/* C. Solution Section (Introducing Sam, the step-by-step call flow) */}
+            <SolutionSection />
 
-        {/* D. Interactive ROI Drag-and-Drop Calculator */}
-        <Calculator />
+            {/* D. Interactive ROI Drag-and-Drop Calculator */}
+            <Calculator />
 
-        {/* E. Outcome-Driven Features Matrix */}
-        <Features />
+            {/* E. Outcome-Driven Features Matrix */}
+            <Features />
 
-        {/* F. Before vs. After Comparison Table */}
-        <Comparison />
+            {/* F. Before vs. After Comparison Table */}
+            <Comparison />
 
-        {/* G. Industries We Serve (Medical & Aesthetic Specialization) */}
-        <Industries />
+            {/* G. Industries We Serve (Medical & Aesthetic Specialization) */}
+            <Industries />
 
-        {/* H. Secondary Service (Premium Conversion Websites Upsell) */}
-        <WebsitesSection onBookDemoClick={handleScrollToBooking} />
+            {/* H. Secondary Service (Premium Conversion Websites Upsell) */}
+            <WebsitesSection onBookDemoClick={handleScrollToBooking} />
 
-        {/* I. Simple White-Glove Onboarding Map */}
-        <Process />
+            {/* I. Simple White-Glove Onboarding Map */}
+            <Process />
 
-        {/* J. Illustrative Social Proof Scenarios */}
-        <CaseScenarios />
+            {/* J. Illustrative Social Proof Scenarios */}
+            <CaseScenarios />
 
-        {/* K. Confident Objection-Handling / FAQ Accordions */}
-        <FAQ />
+            {/* K. Confident Objection-Handling / FAQ Accordions */}
+            <FAQ />
 
-        {/* L. Interactive Calendar Scheduler & Lead Capture Forms */}
-        <BookingForm />
+            {/* L. Interactive Calendar Scheduler & Lead Capture Forms */}
+            <BookingForm />
+          </>
+        )}
+
+        {currentPage === "testimonials" && (
+          <TestimonialsPage onBookDemoClick={handleScrollToBooking} />
+        )}
+
+        {currentPage === "about" && (
+          <AboutUsPage onBookDemoClick={handleScrollToBooking} />
+        )}
       </main>
 
       {/* Modern Minimalist Footer */}
-      <Footer onBookDemoClick={handleScrollToBooking} />
+      <Footer 
+        onBookDemoClick={handleScrollToBooking} 
+        setCurrentPage={setCurrentPage}
+      />
 
       {/* Right-side floating custom scrollbar indicator (small, elegant, changes color according to page) */}
       <div 

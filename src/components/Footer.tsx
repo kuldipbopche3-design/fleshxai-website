@@ -3,23 +3,37 @@ import { PhoneCall, Mail, MapPin } from "lucide-react";
 
 interface FooterProps {
   onBookDemoClick: () => void;
+  setCurrentPage: (page: "home" | "testimonials" | "about") => void;
 }
 
-export default function Footer({ onBookDemoClick }: FooterProps) {
+export default function Footer({ onBookDemoClick, setCurrentPage }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
+    setCurrentPage("home");
+    // Short timeout to allow page layout to switch back to home
+    setTimeout(() => {
+      const element = document.getElementById(id);
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY - offset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    }, 80);
+  };
+
+  const handlePageClick = (e: React.MouseEvent<HTMLAnchorElement>, page: "home" | "testimonials" | "about") => {
+    e.preventDefault();
+    setCurrentPage(page);
+    window.scrollTo({
+      top: 0,
+      behavior: "instant"
+    });
   };
 
   return (
@@ -29,7 +43,11 @@ export default function Footer({ onBookDemoClick }: FooterProps) {
           
           {/* Column 1: Brand & Desc (5 Columns) */}
           <div className="md:col-span-5 space-y-5">
-            <a href="#" className="flex items-center gap-2.5">
+            <a 
+              href="#" 
+              onClick={(e) => handlePageClick(e, "home")} 
+              className="flex items-center gap-2.5"
+            >
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-brand-500/10">
                 <PhoneCall className="w-4.5 h-4.5" />
               </div>
@@ -103,6 +121,24 @@ export default function Footer({ onBookDemoClick }: FooterProps) {
                   Objections & FAQ
                 </a>
               </li>
+              <li className="pt-2 border-t border-slate-900/60">
+                <a 
+                  href="#" 
+                  onClick={(e) => handlePageClick(e, "testimonials")} 
+                  className="hover:text-white transition-colors font-semibold text-brand-400"
+                >
+                  Client Testimonials
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#" 
+                  onClick={(e) => handlePageClick(e, "about")} 
+                  className="hover:text-white transition-colors font-semibold text-brand-400"
+                >
+                  About Our Founder
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -115,7 +151,7 @@ export default function Footer({ onBookDemoClick }: FooterProps) {
             <div>
               <button
                 onClick={onBookDemoClick}
-                className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-xs shadow-md transition-colors"
+                className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-xs shadow-md transition-colors cursor-pointer"
               >
                 Schedule Your System Demo
               </button>
