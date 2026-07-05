@@ -71,7 +71,7 @@ export default function Footer({ onBookDemoClick, setCurrentPage }: FooterProps)
               </p>
               <p className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-brand-500" />
-                <span>Austin, Texas • San Francisco, California</span>
+                <span>Based in India • Serving Clinics Globally</span>
               </p>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function Footer({ onBookDemoClick, setCurrentPage }: FooterProps)
                 onClick={onBookDemoClick}
                 className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-xs shadow-md transition-colors cursor-pointer"
               >
-                Schedule Your System Demo
+                Book a Free Demo
               </button>
             </div>
           </div>

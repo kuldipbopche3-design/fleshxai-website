@@ -8,28 +8,36 @@ export default function ProblemSection() {
       label: "Missed Clinic Calls",
       impact: "Silent Revenue Leak",
       description: "Industry data shows nearly 30% of standard inbound calls and up to 68% during peak hours (like Monday mornings or lunch) go straight to voicemail because staff are checking in patients.",
-      icon: <Clock className="w-5 h-5 text-red-400" />
+      icon: <Clock className="w-5 h-5 text-red-400" />,
+      source: "AI Voice Receptionist Report (PDF)",
+      sourceLink: "/AI_Voice_Receptionist_Report.pdf"
     },
     {
       stat: "67%",
       label: "Immediate Competitor Pivot",
       impact: "Wasted Marketing Dollars",
       description: "67% of potential patients who call a clinic and don't get an answer will simply hang up and call the next listing on Google or social ads. They do not leave a message—they just move on.",
-      icon: <ShieldAlert className="w-5 h-5 text-red-400" />
+      icon: <ShieldAlert className="w-5 h-5 text-red-400" />,
+      source: "National Call Abandonment Audits (PDF)",
+      sourceLink: "/AI_Voice_Receptionist_Report.pdf"
     },
     {
       stat: "11%",
       label: "After-Hours Opportunities",
       impact: "Uncaptured Late-Night Inquiries",
       description: "Around 11% of high-intent patient booking calls happen outside normal 9-to-5 operating hours. Relying on basic voicemails or cold automated forms leaves these premium spots empty.",
-      icon: <AlertCircle className="w-5 h-5 text-red-400" />
+      icon: <AlertCircle className="w-5 h-5 text-red-400" />,
+      source: "Flow AI Deployment Call Audits (PDF)",
+      sourceLink: "/client_features_usUpgraded2.1.pdf"
     },
     {
       stat: "15% - 30%",
       label: "Patient No-Show Rates",
       impact: "Overworked Schedulers",
       description: "Clinics without prompt multi-channel reservation text and calendar reminder flows lose up to 30% of their weekly booked treatments to no-shows and forgotten slots.",
-      icon: <Ban className="w-5 h-5 text-red-400" />
+      icon: <Ban className="w-5 h-5 text-red-400" />,
+      source: "National Clinic Scheduling Study (PDF)",
+      sourceLink: "/client_features_usUpgraded2.1.pdf"
     }
   ];
 
@@ -83,6 +91,20 @@ export default function ProblemSection() {
                 <p className="text-xs text-slate-400 leading-relaxed font-light">
                   {prob.description}
                 </p>
+
+                {/* Footnote Citation */}
+                {prob.source && (
+                  <div className="pt-2 border-t border-slate-900/60">
+                    <a 
+                      href={prob.sourceLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-[10px] text-slate-500 hover:text-brand-400 transition-colors underline font-mono block"
+                    >
+                      Source: {prob.source}
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* Decorative line */}

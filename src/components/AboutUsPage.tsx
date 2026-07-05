@@ -11,33 +11,37 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
       title: "Skinfinity Derma Receptionist",
       role: "Lead Voice Developer & Integrator",
       summary: "A bespoke AI booking receptionist answering dermatological treatment queries, screening medical history, and scheduling appointments directly into janeapp CRM.",
-      impact: "Recovered $8,200 in cosmetic laser fees in its initial 2 weeks."
+      impact: "Recovered $8,200 in cosmetic laser fees in its initial 2 weeks.",
+      pdfUrl: "/client_features_usUpgraded2.1.pdf",
+      verifiableStatement: "Our First Deployment — Full Report Available on Request"
     },
     {
       title: "Apex MedSpa Outbound Recall Bot",
       role: "Conversational Architect",
       summary: "Outbound agent configured to automatically reach out to patients due for their 6-month Botox touchups, delivering custom booking links via conversational speech.",
-      impact: "Re-engaged 28% of lapsed patients without manual staff outreach."
+      impact: "Re-engaged 28% of lapsed patients without manual staff outreach.",
+      pdfUrl: "/AI_Voice_Receptionist_Report.pdf",
+      verifiableStatement: "Our First Deployment — Full Report Available on Request"
     }
   ];
 
   const socialLinks = [
     {
       platform: "Instagram",
-      handle: "@AXION_KD",
-      link: "https://www.instagram.com/AXION_KD",
+      handle: "@flow_ai_voice",
+      link: "https://www.instagram.com/flow_ai_voice",
       bgClass: "bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]",
       hoverShadow: "hover:shadow-[0_0_20px_-5px_rgba(238,42,123,0.35)]",
       icon: (
         <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
         </svg>
       )
     },
     {
       platform: "X / Twitter",
-      handle: "@kuldip_bopche",
-      link: "https://x.com/kuldip_bopche",
+      handle: "@flow_ai_voice",
+      link: "https://x.com/flow_ai_voice",
       bgClass: "bg-black border border-slate-800",
       hoverShadow: "hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.2)]",
       icon: (
@@ -48,7 +52,7 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
     },
     {
       platform: "LinkedIn",
-      handle: "Kuldeep Bopche",
+      handle: "Kuldip Bopche",
       link: "https://www.linkedin.com/posts/kuldeep-bopche-052026284_b2bsales-coldcalling-leadgeneration-share-7462547964364824576-xrWc/?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAEUPCr4BjBmTCXrn_dk2QEKHrEBJvWVSs_A",
       bgClass: "bg-[#0a66c2]",
       hoverShadow: "hover:shadow-[0_0_20px_-5px_rgba(10,102,194,0.35)]",
@@ -60,7 +64,7 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
     },
     {
       platform: "YouTube",
-      handle: "@india-with-AI",
+      handle: "@FlowAIVoice",
       link: "https://www.youtube.com/@india-with-AI",
       bgClass: "bg-[#ff0000]",
       hoverShadow: "hover:shadow-[0_0_20px_-5px_rgba(255,0,0,0.35)]",
@@ -72,7 +76,7 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
     },
     {
       platform: "Pinterest",
-      handle: "kuldipbopche3",
+      handle: "flow_ai_voice",
       link: "https://www.pinterest.com/kuldipbopche3",
       bgClass: "bg-[#e60023]",
       hoverShadow: "hover:shadow-[0_0_20px_-5px_rgba(230,0,35,0.35)]",
@@ -84,7 +88,7 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
     },
     {
       platform: "Facebook",
-      handle: "Kuldeep Bopche",
+      handle: "Kuldip Bopche",
       link: "https://www.facebook.com/share/p/1CtWmp6xFY/",
       bgClass: "bg-[#1877f2]",
       hoverShadow: "hover:shadow-[0_0_20px_-5px_rgba(24,119,242,0.35)]",
@@ -129,6 +133,9 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
             </p>
             <p className="text-slate-400 leading-relaxed font-light text-sm">
               Rather than selling generic chat templates or complex phone systems that clinics must set up themselves, we operate as a full-service, bespoke development agency. We design conversational flows, map availability boundaries, build calendar integrations, and verify latency parameters to ensure every call flows naturally.
+            </p>
+            <p className="text-slate-400 leading-relaxed font-light text-sm">
+              Our development is led by seasoned automation engineer Kuldip Bopche, who brings extensive technical expertise in API design, calendar synchronization pipelines, and conversational voice interfaces. Having built secure data synchronization models for medical CRMs (including Google Calendar and Jane App), Kuldip ensures our agents operate with sub-second latencies and complete data integrity. This background removes the risk of deploying new voice systems, turning them into reliable, institutional-grade clinical assets from day one.
             </p>
 
             <div className="grid sm:grid-cols-3 gap-6 pt-6">
@@ -219,16 +226,31 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
 
         <div className="grid md:grid-cols-2 gap-8">
           {liveProjects.map((project, idx) => (
-            <div key={idx} className="bg-slate-900/40 border border-slate-900 p-8 rounded-2xl flex flex-col justify-between space-y-5 hover:border-slate-850 transition-colors">
-              <div className="space-y-3">
-                <h3 className="font-display text-lg font-bold text-white">{project.title}</h3>
-                <p className="text-[10px] text-brand-400 font-mono tracking-wider">{project.role}</p>
+            <div key={idx} className="bg-slate-900/40 border border-slate-900 p-8 rounded-2xl flex flex-col justify-between space-y-6 hover:border-slate-850 transition-colors">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h3 className="font-display text-lg font-bold text-white">{project.title}</h3>
+                  <p className="text-[10px] text-brand-400 font-mono tracking-wider">{project.role}</p>
+                </div>
                 <p className="text-xs text-slate-400 font-light leading-relaxed">{project.summary}</p>
+                
+                {/* Verifiable statement */}
+                <p className="text-[11px] text-slate-500 font-mono italic">
+                  ✓ {project.verifiableStatement}
+                </p>
               </div>
-              <div className="pt-4 border-t border-slate-900 flex items-center justify-between text-xs">
-                <span className="font-mono text-emerald-400 bg-emerald-950/20 border border-emerald-900/40 px-3 py-1 rounded">
+              <div className="pt-4 border-t border-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+                <span className="font-mono text-emerald-400 bg-emerald-950/20 border border-emerald-900/40 px-3 py-1 rounded inline-block self-start">
                   {project.impact}
                 </span>
+                <a 
+                  href={project.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-mono transition-colors text-center inline-block"
+                >
+                  Download Report (PDF)
+                </a>
               </div>
             </div>
           ))}
@@ -288,7 +310,7 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
               onClick={onBookDemoClick}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-brand-600/15 transition-all duration-300"
             >
-              Get Free Operations Audit <ArrowRight className="w-4 h-4" />
+              Book a Free Demo <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

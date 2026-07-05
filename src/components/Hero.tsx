@@ -96,14 +96,14 @@ export default function Hero({ onBookDemoClick }: HeroProps) {
                 onClick={onBookDemoClick}
                 className="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/25 hover:shadow-brand-500/35 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
               >
-                Book Your 15-Minute Demo
+                Book a Free Demo
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
               <a
                 href="#interactive-demo"
                 className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-850 text-slate-200 hover:text-white border border-slate-800 hover:border-slate-700 font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
               >
-                Try Live Simulator
+                Try Sam
               </a>
             </div>
 

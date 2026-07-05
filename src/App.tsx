@@ -15,6 +15,7 @@ import BookingForm from "./components/BookingForm";
 import Footer from "./components/Footer";
 import TestimonialsPage from "./components/TestimonialsPage";
 import AboutUsPage from "./components/AboutUsPage";
+import Pricing from "./components/Pricing";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<"home" | "testimonials" | "about">("home");
@@ -149,6 +150,9 @@ export default function App() {
 
             {/* J. Illustrative Social Proof Scenarios */}
             <CaseScenarios />
+
+            {/* Pricing Section */}
+            <Pricing onBookDemoClick={handleScrollToBooking} />
 
             {/* K. Confident Objection-Handling / FAQ Accordions */}
             <FAQ />

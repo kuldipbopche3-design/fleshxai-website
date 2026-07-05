@@ -208,7 +208,7 @@ export default function Navbar({
               onClick={onBookDemoClick}
               className="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg shadow-md transition-all cursor-pointer"
             >
-              Book Demo
+              Book a Free Demo
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}

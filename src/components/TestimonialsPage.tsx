@@ -18,8 +18,8 @@ export default function TestimonialsPage({ onBookDemoClick }: TestimonialsPagePr
       icon: <Heart className="w-6 h-6 text-rose-400" />
     },
     {
-      title: "Looking for Founding Clients",
-      description: "We're currently partnering with a limited number of businesses to build our portfolio. Early clients receive dedicated support, fast communication, and our full commitment.",
+      title: "Strategic Performance Partnerships",
+      description: "We partner with select clinics to build custom voice channels. Partners receive direct access to our core automation developers, priority deployment slots, and 24/7 technical operations support.",
       icon: <Sparkles className="w-6 h-6 text-amber-400" />
     }
   ];
@@ -45,10 +45,10 @@ export default function TestimonialsPage({ onBookDemoClick }: TestimonialsPagePr
             Our Approach
           </span>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
-            Building Our Portfolio
+            Bespoke Clinical Deployments
           </h1>
           <p className="text-slate-400 font-light leading-relaxed max-w-2xl mx-auto text-base sm:text-lg">
-            We're a new agency focused on delivering exceptional AI Voice Agents and high-converting websites. Instead of filling our website with fake testimonials, we prefer complete transparency.
+            We are a specialized automation agency focused on delivering high-accuracy AI Voice Agents and lightning-fast clinical websites. Led by seasoned developer Kuldip Bopche, we prioritize absolute transparency and verifiable data over generic marketing copy.
           </p>
         </div>
       </section>
@@ -113,14 +113,14 @@ export default function TestimonialsPage({ onBookDemoClick }: TestimonialsPagePr
       <section className="py-16 text-center max-w-xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
         <div className="space-y-8">
           <p className="text-xs text-slate-500 italic tracking-wide">
-            "Every testimonial you see here in the future will come from a real client."
+            "We build reliable digital staff tailored to your clinic's procedures and guidelines."
           </p>
           <div className="pt-2">
             <button
               onClick={onBookDemoClick}
               className="inline-flex items-center gap-2 px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm rounded-2xl shadow-xl shadow-brand-600/15 transition-all duration-300 hover:scale-[1.02]"
             >
-              Book a Free Strategy Call <ArrowRight className="w-4 h-4" />
+              Book a Free Demo <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
