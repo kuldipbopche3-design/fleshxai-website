@@ -1,0 +1,6 @@
+{
+  "name": "Flow AI Voice Agency",
+  "description": "Premium AI Voice Agents and conversion-focused websites for MedSpas, Dental, and Dermatology clinics to answer every call, book calendar appointments, and recover missed revenue.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
