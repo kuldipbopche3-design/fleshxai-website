@@ -11,11 +11,17 @@ export default function Hero({ onBookDemoClick }: HeroProps) {
   const [currentNodeId, setCurrentNodeId] = useState<string>("start");
   const [callLog, setCallLog] = useState<Array<{ speaker: string; text: string }>>([]);
   const [isCalling, setIsCalling] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   const simulation = MOCK_SIMULATIONS[selectedIndustry];
   const currentNode = simulation.nodes[currentNodeId];
 
   const handleOptionClick = (nextNodeId: string, optionText: string) => {
+    if (optionText.includes("Click to Ring Sam")) {
+      setShowError(true);
+      return;
+    }
+
     // Add user selection to log
     const updatedLog = [...callLog];
     if (currentNodeId !== "start") {
@@ -39,6 +45,7 @@ export default function Hero({ onBookDemoClick }: HeroProps) {
     setCurrentNodeId("start");
     setCallLog([]);
     setIsCalling(false);
+    setShowError(false);
   };
 
   const handleIndustryChange = (ind: "medspa" | "dental") => {
@@ -46,6 +53,7 @@ export default function Hero({ onBookDemoClick }: HeroProps) {
     setCurrentNodeId("start");
     setCallLog([]);
     setIsCalling(false);
+    setShowError(false);
   };
 
   return (
@@ -168,7 +176,19 @@ export default function Hero({ onBookDemoClick }: HeroProps) {
 
               {/* Active Call Visualization / Logs Panel */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950/20">
-                {callLog.length === 0 ? (
+                {showError ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
+                    <div className="w-16 h-16 rounded-full bg-red-950/80 border border-red-800/40 flex items-center justify-center text-red-400 animate-bounce">
+                      <PhoneCall className="w-8 h-8" />
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-display font-bold text-red-500 text-lg">Live Demo Under Development</h4>
+                      <p className="text-xs text-slate-300 max-w-[260px] leading-relaxed">
+                        This feature is currently being finalized to ensure the best experience. Contact us to see a live demonstration.
+                      </p>
+                    </div>
+                  </div>
+                ) : callLog.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                     <div className="w-16 h-16 rounded-full bg-brand-950/80 border border-brand-800/40 flex items-center justify-center text-brand-400 animate-pulse">
                       <PhoneCall className="w-8 h-8" />
@@ -220,7 +240,7 @@ export default function Hero({ onBookDemoClick }: HeroProps) {
               </div>
 
               {/* Animated Waveform (shown when call is active but no results or just typing) */}
-              {callLog.length > 0 && currentNodeId !== "success" && currentNodeId !== "start" && (
+              {!showError && callLog.length > 0 && currentNodeId !== "success" && currentNodeId !== "start" && (
                 <div className="px-6 py-2.5 bg-slate-950 border-t border-b border-slate-800 flex items-center justify-center gap-1.5">
                   <span className="text-[10px] font-mono text-slate-500 uppercase mr-2">SAM SPEAKING:</span>
                   <div className="flex items-center gap-1 h-4">
@@ -235,7 +255,16 @@ export default function Hero({ onBookDemoClick }: HeroProps) {
 
               {/* Action Trigger / Choices Panel */}
               <div className="p-4 bg-slate-950 border-t border-slate-800 flex flex-col gap-2 min-h-[120px] justify-center">
-                {currentNode && currentNode.options ? (
+                {showError ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <button
+                      onClick={handleReset}
+                      className="px-4 py-2.5 bg-slate-900 hover:bg-slate-850 border border-slate-800 rounded-lg text-xs font-mono font-medium text-slate-300 hover:text-white flex items-center gap-2 transition-all"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" /> Restart Simulator
+                    </button>
+                  </div>
+                ) : currentNode && currentNode.options ? (
                   <div className="flex flex-col gap-2">
                     <p className="text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-1">
                       {currentNodeId === "start" ? "INITIATE DEMO" : "SELECT YOUR RESPONSE"}
