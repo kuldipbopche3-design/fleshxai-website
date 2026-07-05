@@ -1,5 +1,5 @@
 import React from "react";
-import { Video, Code, ShieldCheck, Mail, ArrowRight } from "lucide-react";
+import { Video, Code, ShieldCheck, Mail, ArrowRight, PhoneCall } from "lucide-react";
 
 interface AboutUsPageProps {
   onBookDemoClick: () => void;
@@ -165,9 +165,12 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
               <p className="text-xs text-slate-400 leading-relaxed font-light">
                 "We work directly with practitioners and practice managers to build reliable digital staff. When our clients deploy an AI receptionist, we ensure it matches their practice identity down to the treatment protocols."
               </p>
-              <div className="pt-2">
-                <a href="mailto:support@flowvoice.ai" className="inline-flex items-center gap-2 text-xs text-brand-450 hover:text-brand-350 transition-colors font-mono">
-                  <Mail className="w-4 h-4" /> support@flowvoice.ai
+              <div className="pt-2 flex flex-col gap-2">
+                <a href="mailto:kuldipbopche3@gmail.com" className="inline-flex items-center gap-2 text-xs text-brand-450 hover:text-brand-350 transition-colors font-mono">
+                  <Mail className="w-4 h-4" /> kuldipbopche3@gmail.com
+                </a>
+                <a href="tel:+918962417150" className="inline-flex items-center gap-2 text-xs text-brand-450 hover:text-brand-350 transition-colors font-mono">
+                  <PhoneCall className="w-4 h-4" /> +91 89624 17150
                 </a>
               </div>
             </div>

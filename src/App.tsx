@@ -85,21 +85,7 @@ export default function App() {
   }, [currentPage]);
 
   const handleScrollToBooking = () => {
-    if (currentPage !== "home") {
-      sessionStorage.setItem("scrollTarget", "booking");
-      setCurrentPage("home");
-      return;
-    }
-    const bookingSection = document.getElementById("booking");
-    if (bookingSection) {
-      const offset = 80; // account for sticky navbar
-      const elementPosition = bookingSection.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
+    window.open("https://calendly.com/kuldipbopche3/30min", "_blank", "noopener,noreferrer");
   };
 
   const handleScrollToInteractiveDemo = () => {

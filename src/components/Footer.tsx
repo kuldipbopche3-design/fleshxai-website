@@ -60,10 +60,14 @@ export default function Footer({ onBookDemoClick, setCurrentPage }: FooterProps)
               We engineer premium, custom-trained conversational voice agents for appointment-based clinics. Our mission is simple: answer every call instantly, sync schedules smoothly, and recover your lost clinic revenue.
             </p>
 
-            <div className="pt-2 text-xs font-mono space-y-1 text-slate-500">
+            <div className="pt-2 text-xs font-mono space-y-1.5 text-slate-500">
               <p className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-brand-500" />
-                <span>support@flowvoice.ai</span>
+                <a href="mailto:kuldipbopche3@gmail.com" className="hover:text-white transition-colors">kuldipbopche3@gmail.com</a>
+              </p>
+              <p className="flex items-center gap-2">
+                <PhoneCall className="w-3.5 h-3.5 text-brand-500" />
+                <a href="tel:+918962417150" className="hover:text-white transition-colors">+91 89624 17150</a>
               </p>
               <p className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-brand-500" />
