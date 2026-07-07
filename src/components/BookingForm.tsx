@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Calendar, Clock, CheckCircle2, Send, ShieldCheck } from "lucide-react";
+import { Calendar, Clock, CheckCircle2, Send, ShieldCheck, AlertTriangle, Mail, Copy } from "lucide-react";
 
 export default function BookingForm() {
   const [scheduledDate, setScheduledDate] = useState<string>("Monday, July 6");
@@ -47,13 +47,67 @@ export default function BookingForm() {
     setIsBooked(true);
   };
 
-  const handleInquirySubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error" | "activation_required">("idle");
+  const [submitError, setSubmitError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const copyInquiryDetails = () => {
+    const text = `Name: ${inquiryData.name}\nEmail: ${inquiryData.email}\nInquiry: ${inquiryData.message}`;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inquiryData.name || !inquiryData.email || !inquiryData.message) {
       alert("Please fill out all inquiry fields.");
       return;
     }
-    setIsInquirySent(true);
+    
+    setIsSubmitting(true);
+    setSubmitError("");
+    try {
+      // Direct silent submission to FormSubmit.co (First submission requires activation link sent to kuldipbopche3@gmail.com)
+      const response = await fetch("https://formsubmit.co/ajax/kuldipbopche3@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: inquiryData.name,
+          email: inquiryData.email,
+          message: inquiryData.message,
+          _subject: `New Inquiry from ${inquiryData.name} (Flow AI Voice Agency)`
+        })
+      });
+      
+      const res = await response.json();
+      if (res.success === "true" || res.success === true) {
+        setSubmitStatus("success");
+      } else {
+        const msg = res.message || "";
+        if (msg.toLowerCase().includes("activation") || msg.toLowerCase().includes("activate")) {
+          setSubmitStatus("activation_required");
+        } else {
+          throw new Error(msg || "Failed API submission");
+        }
+      }
+    } catch (error: any) {
+      console.error("FormSubmit API failed:", error);
+      const errMsg = error.message || "";
+      if (errMsg.toLowerCase().includes("activation") || errMsg.toLowerCase().includes("activate")) {
+        setSubmitStatus("activation_required");
+      } else {
+        setSubmitError(errMsg || "Failed to submit message to email forwarding service.");
+        setSubmitStatus("error");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -109,13 +163,70 @@ export default function BookingForm() {
                 </p>
               </div>
 
-              {isInquirySent ? (
-                <div className="bg-brand-950/20 border border-brand-800/40 rounded-2xl p-6 text-center space-y-3 animate-fadeIn">
-                  <Send className="w-8 h-8 text-brand-400 mx-auto animate-bounce" />
+              {submitStatus === "success" ? (
+                <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-2xl p-6 text-center space-y-3 animate-fadeIn">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto animate-bounce" />
                   <h5 className="font-display font-bold text-white text-sm">Message Transmitted!</h5>
                   <p className="text-xs text-slate-400">
-                    We've logged your request. Our clinical technician will email you shortly.
+                    We've logged your request. Our team will get back to you shortly at {inquiryData.email}.
                   </p>
+                  <button
+                    onClick={() => {
+                      setSubmitStatus("idle");
+                      setInquiryData({ name: "", email: "", message: "" });
+                    }}
+                    className="text-xs text-brand-400 hover:text-brand-300 font-mono underline cursor-pointer mt-2"
+                  >
+                    Send another inquiry
+                  </button>
+                </div>
+              ) : submitStatus === "activation_required" ? (
+                <div className="bg-amber-950/20 border border-amber-900/40 rounded-2xl p-6 text-center space-y-4 animate-fadeIn">
+                  <Mail className="w-10 h-10 text-amber-400 mx-auto animate-pulse" />
+                  <h5 className="font-display font-bold text-white text-base">Activation Required</h5>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    FormSubmit has sent a confirmation email to <strong className="text-white">kuldipbopche3@gmail.com</strong>.
+                  </p>
+                  <p className="text-[11px] text-slate-400 leading-normal bg-slate-900/60 p-3 rounded-lg border border-slate-850">
+                    Please check your inbox, find the email from FormSubmit, and click <strong className="text-white">"Activate Form"</strong> to start receiving messages.
+                  </p>
+                  <button
+                    onClick={() => setSubmitStatus("idle")}
+                    className="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl text-center shadow-lg transition-all cursor-pointer font-mono"
+                  >
+                    Got it, Back to Form
+                  </button>
+                </div>
+              ) : submitStatus === "error" ? (
+                <div className="bg-red-950/20 border border-red-900/40 rounded-2xl p-6 text-left space-y-3 animate-fadeIn">
+                  <AlertTriangle className="w-8 h-8 text-red-500 mx-auto animate-bounce" />
+                  <h5 className="font-display font-bold text-white text-sm text-center">Transmission Failed</h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    The direct email API could not forward your request silently.
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-mono bg-slate-950/60 p-2.5 rounded-lg border border-slate-850 leading-normal overflow-x-auto">
+                    API Response: {submitError}
+                  </p>
+                  <div className="flex flex-col gap-2 pt-2">
+                    <a
+                      href={`mailto:kuldipbopche3@gmail.com?subject=${encodeURIComponent(`Inquiry from ${inquiryData.name}`)}&body=${encodeURIComponent(`Name: ${inquiryData.name}\nEmail: ${inquiryData.email}\nMessage: ${inquiryData.message}`)}`}
+                      className="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl text-center shadow-lg transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <Mail className="w-4 h-4" /> Send via Email Client (mailto)
+                    </a>
+                    <button
+                      onClick={copyInquiryDetails}
+                      className="w-full py-2.5 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white border border-slate-800 rounded-xl text-xs font-mono transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Copy className="w-4 h-4" /> {copied ? "Copied!" : "Copy Details to Send Manually"}
+                    </button>
+                    <button
+                      onClick={() => setSubmitStatus("idle")}
+                      className="w-full py-2 text-slate-500 hover:text-slate-400 text-xs font-mono transition-colors text-center cursor-pointer"
+                    >
+                      ← Back to Form
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleInquirySubmit} className="space-y-4">
@@ -160,9 +271,10 @@ export default function BookingForm() {
 
                   <button
                     type="submit"
-                    className="w-full py-3 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white border border-slate-800 rounded-xl text-xs font-mono transition-colors"
+                    disabled={isSubmitting}
+                    className="w-full py-3 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white border border-slate-800 rounded-xl text-xs font-mono transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Transmit Inquiry →
+                    {isSubmitting ? "Transmitting..." : "Transmit Inquiry →"}
                   </button>
                 </form>
               )}

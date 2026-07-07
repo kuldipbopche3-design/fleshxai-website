@@ -16,10 +16,20 @@ import Footer from "./components/Footer";
 import TestimonialsPage from "./components/TestimonialsPage";
 import AboutUsPage from "./components/AboutUsPage";
 import Pricing from "./components/Pricing";
+import VoiceWidget from "./components/VoiceWidget";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<"home" | "testimonials" | "about">("home");
   const [scrollPercent, setScrollPercent] = useState(0);
+  const [isVoiceWidgetOpen, setIsVoiceWidgetOpen] = useState(false);
+  const [triggerCallEvent, setTriggerCallEvent] = useState(false);
+  const [isCallActive, setIsCallActive] = useState(false);
+
+  const handleRingSamClick = () => {
+    setTriggerCallEvent(true);
+    // Reset trigger after short duration to allow subsequent triggers
+    setTimeout(() => setTriggerCallEvent(false), 200);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,21 +100,7 @@ export default function App() {
   };
 
   const handleScrollToInteractiveDemo = () => {
-    if (currentPage !== "home") {
-      sessionStorage.setItem("scrollTarget", "interactive-demo");
-      setCurrentPage("home");
-      return;
-    }
-    const demoSection = document.getElementById("interactive-demo");
-    if (demoSection) {
-      const offset = 100; // offset
-      const elementPosition = demoSection.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
+    handleRingSamClick();
   };
 
   return (
@@ -122,7 +118,11 @@ export default function App() {
         {currentPage === "home" && (
           <>
             {/* A. Hero Section with Interactive Live Telephone Simulator */}
-            <Hero onBookDemoClick={handleScrollToBooking} />
+            <Hero 
+              onBookDemoClick={handleScrollToBooking} 
+              onRingSamClick={handleRingSamClick}
+              isCallActive={isCallActive}
+            />
 
             {/* B. Problem Section (The Silent Revenue Leak Stats) */}
             <ProblemSection />
@@ -174,6 +174,7 @@ export default function App() {
       {/* Modern Minimalist Footer */}
       <Footer 
         onBookDemoClick={handleScrollToBooking} 
+        onInteractiveDemoClick={handleScrollToInteractiveDemo}
         setCurrentPage={setCurrentPage}
       />
 
@@ -191,6 +192,14 @@ export default function App() {
           }}
         />
       </div>
+
+      {/* Floating AI Voice Agent Widget */}
+      <VoiceWidget 
+        isOpen={isVoiceWidgetOpen}
+        setIsOpen={setIsVoiceWidgetOpen}
+        triggerCallEvent={triggerCallEvent}
+        onCallStateChange={setIsCallActive}
+      />
     </div>
   );
 }

@@ -133,14 +133,16 @@ export default function Navbar({
             >
               How It Works
             </a>
-            <a
-              href="#interactive-demo"
-              onClick={(e) => handleLinkClick(e, "interactive-demo")}
-              className="text-xs xl:text-sm font-medium text-slate-305 hover:text-white transition-colors flex items-center gap-1.5"
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                onInteractiveDemoClick();
+              }}
+              className="text-xs xl:text-sm font-medium text-slate-305 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Live Demo
-            </a>
+            </button>
             <a
               href="#features"
               onClick={(e) => handleLinkClick(e, "features")}
@@ -255,13 +257,15 @@ export default function Navbar({
             >
               How It Works
             </a>
-            <a
-              href="#interactive-demo"
-              onClick={(e) => handleLinkClick(e, "interactive-demo")}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                onInteractiveDemoClick();
+              }}
+              className="w-full text-left block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Live Demo (Try Sam)
-            </a>
+            </button>
             <a
               href="#features"
               onClick={(e) => handleLinkClick(e, "features")}

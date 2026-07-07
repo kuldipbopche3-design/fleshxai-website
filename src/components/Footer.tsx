@@ -3,10 +3,11 @@ import { PhoneCall, Mail, MapPin } from "lucide-react";
 
 interface FooterProps {
   onBookDemoClick: () => void;
+  onInteractiveDemoClick?: () => void;
   setCurrentPage: (page: "home" | "testimonials" | "about") => void;
 }
 
-export default function Footer({ onBookDemoClick, setCurrentPage }: FooterProps) {
+export default function Footer({ onBookDemoClick, onInteractiveDemoClick, setCurrentPage }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -99,13 +100,17 @@ export default function Footer({ onBookDemoClick, setCurrentPage }: FooterProps)
                 </a>
               </li>
               <li>
-                <a 
-                  href="#interactive-demo" 
-                  onClick={(e) => handleLinkClick(e, "interactive-demo")} 
-                  className="hover:text-white transition-colors font-light"
+                <button 
+                  onClick={() => {
+                    setCurrentPage("home");
+                    if (onInteractiveDemoClick) {
+                      onInteractiveDemoClick();
+                    }
+                  }} 
+                  className="hover:text-white transition-colors font-light text-left cursor-pointer"
                 >
                   Live Interactive Sam
-                </a>
+                </button>
               </li>
               <li>
                 <a 
