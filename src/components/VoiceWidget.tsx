@@ -448,13 +448,11 @@ export default function VoiceWidget({
         
         // Log to transcript if it closed during connection setup
         setTranscript((prev) => {
-          // If we had system connecting log as last, update it with details
-          const details = `Connection closed (code: ${event.code}${event.reason ? `, reason: ${event.reason}` : ""}).`;
           return [
             ...prev,
             {
               speaker: "system",
-              text: `⚠️ ${details} Please check API key, internet, or model availability.`
+              text: "⚠️ Your demo is expired."
             }
           ];
         });
@@ -468,7 +466,7 @@ export default function VoiceWidget({
           ...prev,
           {
             speaker: "system",
-            text: "⚠️ WebSocket connection encountered an error."
+            text: "⚠️ Your demo is expired."
           }
         ]);
         disconnectCall();
@@ -481,7 +479,7 @@ export default function VoiceWidget({
         ...prev,
         {
           speaker: "system",
-          text: `❌ Error: ${e.message || "Failed to start call."}`
+          text: "❌ Your demo is expired."
         }
       ]);
     }
@@ -671,12 +669,12 @@ export default function VoiceWidget({
                   {sessionState === "disconnected" && (
                     <div className="flex items-center gap-1.5 text-red-400 font-mono text-[10px] mb-1">
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                      <span>Connection failed or Mic denied</span>
+                      <span>Your demo is expired</span>
                     </div>
                   )}
                   <p className="text-xs text-slate-400 max-w-[280px]">
                     {sessionState === "disconnected" 
-                      ? "Please check mic permissions/HTTPS and click below to retry." 
+                      ? "Please book a demo call to get full access." 
                       : "Ring Sam now to test our fully autonomous 24/7 AI Desk Receptionist."}
                   </p>
                   <button

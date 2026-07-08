@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import ProblemSection from "./components/ProblemSection";
+import PricingPage from "./components/PricingPage";
 import SolutionSection from "./components/SolutionSection";
 import Calculator from "./components/Calculator";
-import Features from "./components/Features";
 import Comparison from "./components/Comparison";
-import Industries from "./components/Industries";
-import WebsitesSection from "./components/WebsitesSection";
+import SpecsPage from "./components/SpecsPage";
+import HomeAboutPreview from "./components/HomeAboutPreview";
 import Process from "./components/Process";
 import CaseScenarios from "./components/CaseScenarios";
 import FAQ from "./components/FAQ";
@@ -15,11 +14,11 @@ import BookingForm from "./components/BookingForm";
 import Footer from "./components/Footer";
 import TestimonialsPage from "./components/TestimonialsPage";
 import AboutUsPage from "./components/AboutUsPage";
-import Pricing from "./components/Pricing";
+
 import VoiceWidget from "./components/VoiceWidget";
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<"home" | "testimonials" | "about">("home");
+  const [currentPage, setCurrentPage] = useState<"home" | "testimonials" | "about" | "specs" | "pricing">("home");
   const [scrollPercent, setScrollPercent] = useState(0);
   const [isVoiceWidgetOpen, setIsVoiceWidgetOpen] = useState(false);
   const [triggerCallEvent, setTriggerCallEvent] = useState(false);
@@ -124,8 +123,7 @@ export default function App() {
               isCallActive={isCallActive}
             />
 
-            {/* B. Problem Section (The Silent Revenue Leak Stats) */}
-            <ProblemSection />
+
 
             {/* C. Solution Section (Introducing Sam, the step-by-step call flow) */}
             <SolutionSection />
@@ -133,17 +131,11 @@ export default function App() {
             {/* D. Interactive ROI Drag-and-Drop Calculator */}
             <Calculator />
 
-            {/* E. Outcome-Driven Features Matrix */}
-            <Features />
-
             {/* F. Before vs. After Comparison Table */}
             <Comparison />
 
-            {/* G. Industries We Serve (Medical & Aesthetic Specialization) */}
-            <Industries />
-
-            {/* H. Secondary Service (Premium Conversion Websites Upsell) */}
-            <WebsitesSection onBookDemoClick={handleScrollToBooking} />
+            {/* Preview of About Us sections on the home screen */}
+            <HomeAboutPreview onAboutUsClick={() => setCurrentPage("about")} />
 
             {/* I. Simple White-Glove Onboarding Map */}
             <Process />
@@ -151,8 +143,7 @@ export default function App() {
             {/* J. Illustrative Social Proof Scenarios */}
             <CaseScenarios />
 
-            {/* Pricing Section */}
-            <Pricing onBookDemoClick={handleScrollToBooking} />
+
 
             {/* K. Confident Objection-Handling / FAQ Accordions */}
             <FAQ />
@@ -168,6 +159,14 @@ export default function App() {
 
         {currentPage === "about" && (
           <AboutUsPage onBookDemoClick={handleScrollToBooking} />
+        )}
+
+        {currentPage === "specs" && (
+          <SpecsPage onBookDemoClick={handleScrollToBooking} />
+        )}
+
+        {currentPage === "pricing" && (
+          <PricingPage onBookDemoClick={handleScrollToBooking} />
         )}
       </main>
 

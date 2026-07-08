@@ -161,8 +161,8 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
           <div className="lg:col-span-5 bg-slate-900/30 border border-slate-900 rounded-3xl p-8 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-tr from-brand-950/20 via-transparent to-transparent pointer-events-none" />
             <div className="space-y-6 relative">
-              {/* Founder Avatar */}
-              <div className="w-24 h-24 rounded-2xl overflow-hidden border border-slate-800 shadow-xl shadow-brand-600/10 bg-slate-950">
+              {/* Founder Avatar - Enlarged to w-36 h-36 */}
+              <div className="w-36 h-36 rounded-2xl overflow-hidden border border-slate-800 shadow-xl shadow-brand-600/10 bg-slate-950">
                 <img 
                   src="/MyImg.png" 
                   alt="Kuldip Bopche" 

@@ -4,7 +4,7 @@ import { PhoneCall, Mail, MapPin } from "lucide-react";
 interface FooterProps {
   onBookDemoClick: () => void;
   onInteractiveDemoClick?: () => void;
-  setCurrentPage: (page: "home" | "testimonials" | "about") => void;
+  setCurrentPage: (page: "home" | "testimonials" | "about" | "specs" | "pricing") => void;
 }
 
 export default function Footer({ onBookDemoClick, onInteractiveDemoClick, setCurrentPage }: FooterProps) {
@@ -28,7 +28,7 @@ export default function Footer({ onBookDemoClick, onInteractiveDemoClick, setCur
     }, 80);
   };
 
-  const handlePageClick = (e: React.MouseEvent<HTMLAnchorElement>, page: "home" | "testimonials" | "about") => {
+  const handlePageClick = (e: React.MouseEvent<HTMLAnchorElement>, page: "home" | "testimonials" | "about" | "specs" | "pricing") => {
     e.preventDefault();
     setCurrentPage(page);
     window.scrollTo({

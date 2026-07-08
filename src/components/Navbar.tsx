@@ -4,8 +4,8 @@ import { Menu, X, PhoneCall } from "lucide-react";
 interface NavbarProps {
   onBookDemoClick: () => void;
   onInteractiveDemoClick: () => void;
-  currentPage: "home" | "testimonials" | "about";
-  setCurrentPage: (page: "home" | "testimonials" | "about") => void;
+  currentPage: "home" | "testimonials" | "about" | "specs" | "pricing";
+  setCurrentPage: (page: "home" | "testimonials" | "about" | "specs" | "pricing") => void;
 }
 
 export default function Navbar({ 
@@ -81,7 +81,7 @@ export default function Navbar({
     });
   };
 
-  const navigateToPage = (page: "home" | "testimonials" | "about") => {
+  const navigateToPage = (page: "home" | "testimonials" | "about" | "specs" | "pricing") => {
     setIsOpen(false);
     setCurrentPage(page);
     window.scrollTo({
@@ -117,22 +117,7 @@ export default function Navbar({
             </a>
           </div>
 
-          {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-            <a
-              href="#services"
-              onClick={(e) => handleLinkClick(e, "services")}
-              className="text-xs xl:text-sm font-medium text-slate-305 hover:text-white transition-colors"
-            >
-              Services
-            </a>
-            <a
-              href="#how-it-works"
-              onClick={(e) => handleLinkClick(e, "how-it-works")}
-              className="text-xs xl:text-sm font-medium text-slate-305 hover:text-white transition-colors"
-            >
-              How It Works
-            </a>
             <button
               onClick={() => {
                 setIsOpen(false);
@@ -143,29 +128,26 @@ export default function Navbar({
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Live Demo
             </button>
-            <a
-              href="#features"
-              onClick={(e) => handleLinkClick(e, "features")}
-              className="text-xs xl:text-sm font-medium text-slate-305 hover:text-white transition-colors"
+            <button
+              onClick={() => navigateToPage("specs")}
+              className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer ${
+                currentPage === "specs" 
+                  ? "text-brand-400 font-semibold border-b border-brand-500 pb-0.5" 
+                  : "text-slate-305 hover:text-white"
+              }`}
             >
-              Features
-            </a>
-            <a
-              href="#roi-calculator"
-              onClick={(e) => handleLinkClick(e, "roi-calculator")}
-              className="text-xs xl:text-sm font-medium text-slate-305 hover:text-white transition-colors"
+              Specifications
+            </button>
+            <button
+              onClick={() => navigateToPage("pricing")}
+              className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer ${
+                currentPage === "pricing" 
+                  ? "text-brand-400 font-semibold border-b border-brand-500 pb-0.5" 
+                  : "text-slate-305 hover:text-white"
+              }`}
             >
-              ROI Calculator
-            </a>
-            <a
-              href="#faq"
-              onClick={(e) => handleLinkClick(e, "faq")}
-              className="text-xs xl:text-sm font-medium text-slate-305 hover:text-white transition-colors"
-            >
-              FAQ
-            </a>
-            
-            {/* Added Pages links */}
+              Pricing
+            </button>
             <button
               onClick={() => navigateToPage("testimonials")}
               className={`text-xs xl:text-sm font-medium transition-colors cursor-pointer ${
@@ -243,52 +225,35 @@ export default function Navbar({
       {isOpen && (
         <div className="lg:hidden bg-slate-900 border-b border-slate-800 animate-fadeIn">
           <div className="px-4 pt-2 pb-6 space-y-2">
-            <a
-              href="#services"
-              onClick={(e) => handleLinkClick(e, "services")}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
-            >
-              Services
-            </a>
-            <a
-              href="#how-it-works"
-              onClick={(e) => handleLinkClick(e, "how-it-works")}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
-            >
-              How It Works
-            </a>
             <button
               onClick={() => {
                 setIsOpen(false);
                 onInteractiveDemoClick();
               }}
-              className="w-full text-left block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              className="w-full text-left block px-3 py-2 rounded-lg text-sm font-medium text-slate-305 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Live Demo (Try Sam)
             </button>
-            <a
-              href="#features"
-              onClick={(e) => handleLinkClick(e, "features")}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            <button
+              onClick={() => navigateToPage("specs")}
+              className={`w-full text-left block px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                currentPage === "specs"
+                  ? "bg-brand-950/40 text-brand-400 font-semibold border-l-2 border-brand-500 pl-2"
+                  : "text-slate-305 hover:text-white hover:bg-slate-800"
+              }`}
             >
-              Features
-            </a>
-            <a
-              href="#roi-calculator"
-              onClick={(e) => handleLinkClick(e, "roi-calculator")}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+              Specifications
+            </button>
+            <button
+              onClick={() => navigateToPage("pricing")}
+              className={`w-full text-left block px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                currentPage === "pricing"
+                  ? "bg-brand-950/40 text-brand-400 font-semibold border-l-2 border-brand-500 pl-2"
+                  : "text-slate-305 hover:text-white hover:bg-slate-800"
+              }`}
             >
-              ROI Calculator
-            </a>
-            <a
-              href="#faq"
-              onClick={(e) => handleLinkClick(e, "faq")}
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
-            >
-              FAQ
-            </a>
-            
-            {/* Added Pages links for mobile */}
+              Pricing
+            </button>
             <button
               onClick={() => navigateToPage("testimonials")}
               className={`w-full text-left block px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
