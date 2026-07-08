@@ -307,8 +307,7 @@ export default function VoiceWidget({
       };
 
       // 5. Connect WebSocket
-      // Obfuscated to bypass GitHub push protection rules for public repositories
-      const apiKey = ["AQ.", "Ab8RN6KTiu", "Evn7gbkdTg", "VxzRrqzUqF", "BvSdg6ZaMG", "8x4rao7XDg"].join("");
+      const apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY;
       const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
