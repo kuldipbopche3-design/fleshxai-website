@@ -10,6 +10,7 @@ import HomeAboutPreview from "./components/HomeAboutPreview";
 import Process from "./components/Process";
 import CaseScenarios from "./components/CaseScenarios";
 import FAQ from "./components/FAQ";
+import WorkflowShowcase from "./components/WorkflowShowcase";
 import BookingForm from "./components/BookingForm";
 import Footer from "./components/Footer";
 import TestimonialsPage from "./components/TestimonialsPage";
@@ -143,9 +144,10 @@ export default function App() {
             {/* J. Illustrative Social Proof Scenarios */}
             <CaseScenarios />
 
+            {/* K. AI Workflow Proof Screenshots */}
+            <WorkflowShowcase />
 
-
-            {/* K. Confident Objection-Handling / FAQ Accordions */}
+            {/* L. Confident Objection-Handling / FAQ Accordions */}
             <FAQ />
 
             {/* L. Interactive Calendar Scheduler & Lead Capture Forms */}
