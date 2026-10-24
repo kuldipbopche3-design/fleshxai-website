@@ -63,5 +63,5 @@
 * **Country:** India
 * **Direct Mobile:** `+91 89624 17150`
 * **US Interactive Voice Demo Line:** `+1 (213) 695-0612`
-* **Support Email:** `kuldipbopche3@gmail.com` / `support@fleshxai.site`
+* **Support Email:** `kuldipbopche3@gmail.com`
 * **Website:** `https://fleshxai.site`
