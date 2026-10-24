@@ -16,7 +16,7 @@ export default function Hero({ onBookDemoClick, onRingSamClick, isCallActive }: 
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
-          
+
           {/* Tagline Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 shadow-inner">
             <span className="flex h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
@@ -35,8 +35,8 @@ export default function Hero({ onBookDemoClick, onRingSamClick, isCallActive }: 
 
           {/* Subheadline */}
           <p className="max-w-2xl mx-auto text-lg text-slate-400 font-light leading-relaxed">
-            Meet <strong className="text-white font-medium">Sam</strong>, our intelligent 24/7 AI voice receptionist. 
-            Sam answers inbound calls instantly, answers treatment FAQs, schedules appointments into your calendar, 
+            Meet <strong className="text-white font-medium">Sam</strong>, our intelligent 24/7 AI voice receptionist.
+            Sam answers inbound calls instantly, answers treatment FAQs, schedules appointments into your calendar,
             and rescues lost leads—stopping your clinic's silent revenue leaks today.
           </p>
 

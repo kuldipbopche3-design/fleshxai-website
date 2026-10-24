@@ -1,17 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Clock, AlertTriangle, RefreshCw, X } from "lucide-react";
+import { Phone, PhoneOff, Clock, X, Lock, Send, Mic, MicOff, Volume2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { SYSTEM_INSTRUCTION } from "../constants/systemInstruction";
-import {
-  downsampleFloat32To16kHz,
-  convertFloat32ToInt16,
-  arrayBufferToBase64,
-  base64ToArrayBuffer,
-  convertInt16ToFloat32
-} from "../utils/audioProcessor";
 
-// Standard styling variables for the avatar pulse
-interface TranscriptItem {
+interface ChatMessage {
   speaker: "sam" | "caller" | "system";
   text: string;
 }
@@ -23,498 +15,523 @@ interface VoiceWidgetProps {
   onCallStateChange?: (active: boolean) => void;
 }
 
+// ─── Neural Human Voice Picker ────────────────────────────────────────────────
+function getBestVoice(): SpeechSynthesisVoice | null {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || voices.length === 0) return null;
+
+  // 1. Edge & Chrome Natural / Neural voices
+  const neural = voices.find(
+    (v) =>
+      v.lang.startsWith("en") &&
+      (v.name.includes("Natural") || v.name.includes("Online") || v.name.includes("Neural"))
+  );
+  if (neural) return neural;
+
+  // 2. Google English voices (Chrome)
+  const google = voices.find(
+    (v) => v.lang.startsWith("en") && (v.name.includes("Google US") || v.name.includes("Google UK"))
+  );
+  if (google) return google;
+
+  // 3. Any Google English voice
+  const googleAny = voices.find((v) => v.lang.startsWith("en") && v.name.includes("Google"));
+  if (googleAny) return googleAny;
+
+  // 4. Any English voice except old Windows robotic voices (David, Zira)
+  const standardEn = voices.find(
+    (v) => v.lang.startsWith("en") && !["David", "Zira", "Hazel", "Cortana"].some((b) => v.name.includes(b))
+  );
+  if (standardEn) return standardEn;
+
+  return voices.find((v) => v.lang.startsWith("en")) || voices[0] || null;
+}
+
 export default function VoiceWidget({
   isOpen,
   setIsOpen,
   triggerCallEvent,
   onCallStateChange
 }: VoiceWidgetProps) {
-  // Session States: 
-  // 'idle' - fresh visitor, call not started
-  // 'connecting' - connecting websocket / requesting mic
-  // 'connected' - call active and streaming
-  // 'ended' - session finished (either user hung up or 4 min timer ran out)
-  // 'trial_used' - subsequent visit where localStorage indicates trial used
   const [sessionState, setSessionState] = useState<
     "idle" | "connecting" | "connected" | "ended" | "trial_used"
   >("idle");
 
-  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes limit (120s)
+  const [timeLeft, setTimeLeft] = useState(120);
   const [userVolume, setUserVolume] = useState(0);
   const [aiVolume, setAiVolume] = useState(0);
-  const [transcript, setTranscript] = useState<TranscriptItem[]>([]);
+  const [transcript, setTranscript] = useState<ChatMessage[]>([]);
+  const [isMuted, setIsMuted] = useState(false);
+  const [textInput, setTextInput] = useState("");
+  const [statusText, setStatusText] = useState<string>("Standby");
+  const [interimUserText, setInterimUserText] = useState<string>("");
+  const [activeVoiceName, setActiveVoiceName] = useState<string>("");
+  const [apiErrorMsg, setApiErrorMsg] = useState<string | null>(null);
 
-  // Web Audio Refs
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const processorRef = useRef<ScriptProcessorNode | null>(null);
-  const aiAnalyserRef = useRef<AnalyserNode | null>(null);
-  const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
-  const nextPlayTimeRef = useRef<number>(0);
-  const volumeAnimRef = useRef<number | null>(null);
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    return localStorage.getItem("voice_agent_unlocked") === "true";
+  });
 
-  // WebSocket Ref
-  const wsRef = useRef<WebSocket | null>(null);
-  
-  // UI Scroll Ref
+  // State refs
+  const isAliveRef = useRef(false);
+  const isMutedRef = useRef(false);
+  const isSpeakingRef = useRef(false);
+  const recognitionRef = useRef<any>(null);
+  const conversationHistoryRef = useRef<{ role: string; parts: { text: string }[] }[]>([]);
+  const lastProcessedPhraseRef = useRef("");
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Check trial on mount
+  // Audio meter refs
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animFrameRef = useRef<number | null>(null);
+
   useEffect(() => {
-    const used = localStorage.getItem("sam_voice_agent_used");
-    if (used === "true") {
-      setSessionState("trial_used");
+    const handleUnlocked = () => setIsUnlocked(true);
+    window.addEventListener("voice_agent_unlocked", handleUnlocked);
+
+    const updateVoiceList = () => {
+      const v = getBestVoice();
+      if (v) setActiveVoiceName(v.name);
+    };
+
+    updateVoiceList();
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = updateVoiceList;
     }
+
+    const used = localStorage.getItem("sam_voice_agent_used");
+    if (used === "true") setSessionState("trial_used");
+
+    return () => {
+      window.removeEventListener("voice_agent_unlocked", handleUnlocked);
+    };
   }, []);
 
-  // Handle external call trigger (e.g. from Hero component button)
   useEffect(() => {
     if (triggerCallEvent) {
       setIsOpen(true);
-      if (sessionState === "idle") {
+      if (!isUnlocked) {
+        scrollToForm();
+      } else if (sessionState === "idle") {
         startCall();
       }
     }
   }, [triggerCallEvent]);
 
-  // Sync call active state with parent if needed
   useEffect(() => {
-    if (onCallStateChange) {
-      onCallStateChange(sessionState === "connected" || sessionState === "connecting");
-    }
+    onCallStateChange?.(sessionState === "connected" || sessionState === "connecting");
   }, [sessionState]);
 
-  // Scroll to bottom of transcript
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [transcript]);
+  }, [transcript, interimUserText]);
 
-  // Timer countdown hook
   useEffect(() => {
     if (sessionState !== "connected") return;
     if (timeLeft <= 0) {
-      disconnectCall("ended");
+      endCall();
       return;
     }
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-
+    const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     return () => clearInterval(timer);
   }, [timeLeft, sessionState]);
 
-  // Clean up on unmount
   useEffect(() => {
-    return () => {
-      cleanupAudioAndWS();
-    };
+    return () => stopAll();
   }, []);
 
-  const cleanupAudioAndWS = () => {
-    // Stop all active audio buffers playing
-    activeSourcesRef.current.forEach((src) => {
+  const scrollToForm = () => {
+    setIsOpen(false);
+    const el = document.getElementById("ask-question-form") || document.getElementById("booking");
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  };
+
+  const stopAll = () => {
+    isAliveRef.current = false;
+    isSpeakingRef.current = false;
+
+    if (recognitionRef.current) {
       try {
-        src.stop();
-      } catch (e) {}
-    });
-    activeSourcesRef.current = [];
-
-    // Disconnect mic input processor
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-      processorRef.current = null;
+        recognitionRef.current.abort();
+      } catch (_) {}
+      recognitionRef.current = null;
     }
 
-    // Stop mic stream tracks
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {}
     }
 
-    // Close AudioContext
     if (audioContextRef.current) {
-      audioContextRef.current.close().catch(() => {});
+      try {
+        audioContextRef.current.close();
+      } catch (_) {}
       audioContextRef.current = null;
     }
 
-    // Close WebSocket
-    if (wsRef.current) {
-      if (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING) {
-        wsRef.current.close();
-      }
-      wsRef.current = null;
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
     }
 
-    // Cancel animation frame
-    if (volumeAnimRef.current) {
-      cancelAnimationFrame(volumeAnimRef.current);
-      volumeAnimRef.current = null;
-    }
+    setUserVolume(0);
+    setAiVolume(0);
+    setStatusText("Standby");
+    setInterimUserText("");
   };
 
-  // Stop playback queue (interruption)
-  const stopPlayback = () => {
-    activeSourcesRef.current.forEach((src) => {
+  // ─── Robust Speech Output (Safe Un-Stuck Speech Synthesizer) ─────────────────
+  const speakText = (fullText: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+
+    // Reset speech engine
+    window.speechSynthesis.cancel();
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
+
+    isSpeakingRef.current = true;
+
+    // Temporarily pause mic recognition while Sam speaks to prevent mic feedback
+    if (recognitionRef.current) {
       try {
-        src.stop();
-      } catch (e) {}
-    });
-    activeSourcesRef.current = [];
-    if (audioContextRef.current) {
-      nextPlayTimeRef.current = audioContextRef.current.currentTime;
-    }
-  };
-
-  // Schedule playing audio chunk
-  const playAudioChunk = (float32Data: Float32Array) => {
-    if (!audioContextRef.current) return;
-    const ctx = audioContextRef.current;
-
-    // Output sample rate from Gemini is 24,000 Hz PCM
-    const buffer = ctx.createBuffer(1, float32Data.length, 24000);
-    buffer.getChannelData(0).set(float32Data);
-
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-
-    // Connect to volume analyser
-    if (aiAnalyserRef.current) {
-      source.connect(aiAnalyserRef.current);
-    } else {
-      source.connect(ctx.destination);
+        recognitionRef.current.stop();
+      } catch (_) {}
     }
 
-    // Sequential playback scheduling
-    const now = ctx.currentTime;
-    // Reset playTime if no active sources are playing to avoid accumulated latency drift
-    let playTime = nextPlayTimeRef.current;
-    if (activeSourcesRef.current.length === 0 || playTime < now) {
-      playTime = now + 0.06; // 60ms buffer delay to smooth out packet jitter
-    }
-    source.start(playTime);
-
-    activeSourcesRef.current.push(source);
-    source.onended = () => {
-      activeSourcesRef.current = activeSourcesRef.current.filter((s) => s !== source);
-    };
-
-    const duration = float32Data.length / 24000;
-    nextPlayTimeRef.current = playTime + duration;
-  };
-
-  // Real-time AI volume extraction
-  const updateAiVolume = (analyser: AnalyserNode) => {
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    const draw = () => {
-      if (!aiAnalyserRef.current) return;
-      analyser.getByteFrequencyData(dataArray);
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) {
-        sum += dataArray[i];
-      }
-      const avg = sum / dataArray.length;
-      setAiVolume(avg); // 0 to 255
-      volumeAnimRef.current = requestAnimationFrame(draw);
-    };
-    volumeAnimRef.current = requestAnimationFrame(draw);
-  };
-
-  // Start connection
-  const startCall = async () => {
-    // If user has already used up their trial, restrict call
-    if (localStorage.getItem("sam_voice_agent_used") === "true") {
-      setSessionState("trial_used");
+    const cleanText = fullText.replace(/[*_#`~]/g, "").trim();
+    if (!cleanText) {
+      isSpeakingRef.current = false;
+      setStatusText("Listening...");
+      setAiVolume(0);
       return;
     }
 
-    cleanupAudioAndWS();
-    setSessionState("connecting");
-    setTranscript([{ speaker: "system", text: "Connecting to Sam, please wait..." }]);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    const voice = getBestVoice();
+    if (voice) {
+      utterance.voice = voice;
+      setActiveVoiceName(voice.name);
+    }
+
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    let finished = false;
+    const maxDurationMs = Math.max(3500, cleanText.length * 80);
+
+    const finishSpeech = () => {
+      if (!finished) {
+        finished = true;
+        isSpeakingRef.current = false;
+        setStatusText("Listening...");
+        setAiVolume(0);
+
+        // Resume mic recognition
+        if (isAliveRef.current && recognitionRef.current) {
+          try {
+            recognitionRef.current.start();
+          } catch (_) {}
+        }
+      }
+    };
+
+    const safetyTimer = setTimeout(finishSpeech, maxDurationMs);
+
+    utterance.onstart = () => {
+      setStatusText("Sam Speaking");
+      setAiVolume(65);
+    };
+
+    utterance.onend = () => {
+      clearTimeout(safetyTimer);
+      finishSpeech();
+    };
+
+    utterance.onerror = () => {
+      clearTimeout(safetyTimer);
+      finishSpeech();
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // ─── Query Gemini 2.5 Flash (Confirmed Active 200 OK Model) ──────────────────
+  const processUserSpeech = async (userText: string) => {
+    if (!isAliveRef.current || !userText.trim()) return;
+
+    setStatusText("Thinking...");
+    setApiErrorMsg(null);
 
     try {
-      // Guard for secure contexts
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error("Microphone API (getUserMedia) is not supported in this browser context. Note: Microphone access requires a secure origin (localhost or HTTPS). If you are accessing via a network IP, please use http://localhost:3000/ instead.");
+      const apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("Gemini API key is missing in .env");
       }
 
-      // 1. Mic capture with echo cancellation, noise suppression, and AGC to capture input clearly
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
+      // Ensure valid alternating history starting with user role
+      const rawHistory = conversationHistoryRef.current.slice(-8);
+      const validHistory: { role: string; parts: { text: string }[] }[] = [];
+
+      for (const item of rawHistory) {
+        if (validHistory.length === 0) {
+          if (item.role === "user") validHistory.push(item);
+        } else {
+          const lastRole = validHistory[validHistory.length - 1].role;
+          if (item.role !== lastRole) {
+            validHistory.push(item);
+          }
         }
-      });
-      streamRef.current = stream;
+      }
 
-      // 2. Audio Context (explicitly requested at 16000Hz for low-latency native resampling)
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({
-        sampleRate: 16000
-      });
-      audioContextRef.current = audioCtx;
-      nextPlayTimeRef.current = audioCtx.currentTime;
+      const contents = [
+        ...validHistory,
+        { role: "user", parts: [{ text: userText }] }
+      ];
 
-      // 3. AI analyser node
-      const aiAnalyser = audioCtx.createAnalyser();
-      aiAnalyser.fftSize = 256;
-      aiAnalyser.connect(audioCtx.destination);
-      aiAnalyserRef.current = aiAnalyser;
-      updateAiVolume(aiAnalyser);
-
-      // 4. Script Processor for downsampling mic to 16kHz (buffer size 1024 at 16kHz is a low-latency 64ms chunk size)
-      const source = audioCtx.createMediaStreamSource(stream);
-      const processor = audioCtx.createScriptProcessor(1024, 1, 1);
-      source.connect(processor);
-      processor.connect(audioCtx.destination);
-      processorRef.current = processor;
-
-      processor.onaudioprocess = (e) => {
-        const inputData = e.inputBuffer.getChannelData(0);
-
-        // Calculate User Volume (RMS)
-        let sum = 0;
-        for (let i = 0; i < inputData.length; i++) {
-          sum += inputData[i] * inputData[i];
-        }
-        const rms = Math.sqrt(sum / inputData.length);
-        const vol = rms * 100;
-        setUserVolume(vol);
-
-        // Barge-in check: If user talks above threshold while Sam is speaking
-        const isAiSpeaking = nextPlayTimeRef.current > audioCtx.currentTime + 0.1;
-        if (vol > 6 && isAiSpeaking) {
-          stopPlayback();
-        }
-
-        // Process audio to 16kHz Int16 Base64
-        const resampled = downsampleFloat32To16kHz(inputData, audioCtx.sampleRate);
-        const int16 = convertFloat32ToInt16(resampled);
-        const base64 = arrayBufferToBase64(int16.buffer);
-
-        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(
-            JSON.stringify({
-              realtimeInput: {
-                audio: {
-                  mimeType: "audio/pcm;rate=16000",
-                  data: base64
-                }
-              }
-            })
-          );
-        }
-      };
-
-      // 5. Connect WebSocket
-      const apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY;
-      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        // Setup payload
-        const setupPayload = {
-          setup: {
-            model: "models/gemini-3.1-flash-live-preview",
-            generationConfig: {
-              responseModalities: ["AUDIO"],
-              speechConfig: {
-                voiceConfig: {
-                  prebuiltVoiceConfig: {
-                    voiceName: "Fenrir"
-                  }
-                }
-              }
-            },
-            systemInstruction: {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: {
               parts: [{ text: SYSTEM_INSTRUCTION }]
             },
-            inputAudioTranscription: {},
-            realtimeInputConfig: {
-              automaticActivityDetection: {
-                disabled: false,
-                silenceDurationMs: 1500
-              }
-            }
-          }
-        };
-
-        ws.send(JSON.stringify(setupPayload));
-        setSessionState("connected");
-        setTimeLeft(120);
-        setTranscript([
-          {
-            speaker: "system",
-            text: "Connected. Sam is starting the call..."
-          }
-        ]);
-
-        // Send a text prompt to trigger Sam's greeting immediately so they speak first
-        ws.send(
-          JSON.stringify({
-            clientContent: {
-              turns: [
-                {
-                  role: "user",
-                  parts: [
-                    {
-                      text: "Hello, I just connected. Greet me warmly in English and ask how you can help."
-                    }
-                  ]
-                }
-              ],
-              turnComplete: true
+            contents,
+            generationConfig: {
+              maxOutputTokens: 500, // Ample output space for complete answers
+              temperature: 0.7
             }
           })
-        );
-      };
+        }
+      );
 
-      ws.onmessage = async (event) => {
-        let textData = "";
-        if (typeof event.data === "string") {
-          textData = event.data;
-        } else if (event.data instanceof Blob) {
-          textData = await event.data.text();
-        } else if (event.data instanceof ArrayBuffer) {
-          textData = new TextDecoder().decode(event.data);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("[VoiceWidget] Gemini 2.5 API error response:", errorData);
+        throw new Error(errorData.error?.message || `API error ${response.status}`);
+      }
+
+      const data = await response.json();
+      const replyText =
+        data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()?.replace(/\n+/g, " ") || "";
+
+      if (!replyText || !isAliveRef.current) return;
+
+      // Save to history
+      conversationHistoryRef.current.push(
+        { role: "user", parts: [{ text: userText }] },
+        { role: "model", parts: [{ text: replyText }] }
+      );
+
+      setTranscript((prev) => [...prev, { speaker: "sam", text: replyText }]);
+
+      // Speak complete reply
+      speakText(replyText);
+
+    } catch (err: any) {
+      console.error("[VoiceWidget] Gemini 2.5 Flash error:", err);
+      setApiErrorMsg(err.message || "Failed to query Gemini API");
+      const fallback = "I'm sorry, I couldn't process that. Could you please try asking again?";
+      setTranscript((prev) => [...prev, { speaker: "sam", text: fallback }]);
+      speakText(fallback);
+    }
+  };
+
+  // ─── Speech Recognition (Listening) ─────────────────────────────────────────
+  const startSpeechRecognition = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) {
+      console.warn("[VoiceWidget] Speech Recognition not supported in this browser.");
+      return;
+    }
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch (_) {}
+      recognitionRef.current = null;
+    }
+
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = "en-US";
+    recognitionRef.current = rec;
+
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    rec.onresult = (e: any) => {
+      if (isSpeakingRef.current) return;
+
+      let interim = "";
+      let newFinalPhrase = "";
+
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const transcriptChunk = e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          newFinalPhrase += transcriptChunk;
         } else {
-          return;
+          interim += transcriptChunk;
         }
+      }
 
-        try {
-          const msg = JSON.parse(textData);
+      if (interim) {
+        setInterimUserText(interim);
+        setStatusText("User Speaking...");
+      }
 
-          // Server-side interruption detection
-          if (msg.serverContent?.interrupted) {
-            stopPlayback();
-            return;
-          }
+      const cleanFinal = newFinalPhrase.trim();
+      if (cleanFinal) {
+        setInterimUserText("");
 
-          // Handle audio data
-          if (msg.serverContent?.modelTurn?.parts) {
-            const parts = msg.serverContent.modelTurn.parts;
-            for (const part of parts) {
-              if (part.inlineData && part.inlineData.data) {
-                const buffer = base64ToArrayBuffer(part.inlineData.data);
-                const float32 = convertInt16ToFloat32(new Int16Array(buffer));
-                playAudioChunk(float32);
-              }
-            }
-          }
+        if (cleanFinal.length < 2) return;
+        if (cleanFinal.toLowerCase() === lastProcessedPhraseRef.current.toLowerCase()) return;
 
-          // Handle transcription streams
-          if (msg.serverContent) {
-            const { inputTranscription, outputTranscription } = msg.serverContent;
+        lastProcessedPhraseRef.current = cleanFinal;
+        setTranscript((prev) => [...prev, { speaker: "caller", text: cleanFinal }]);
 
-            if (inputTranscription && inputTranscription.text) {
-              setTranscript((prev) => {
-                const last = prev[prev.length - 1];
-                if (last && last.speaker === "caller") {
-                  // Update the last caller bubble with the new accumulated transcription text
-                  return [
-                    ...prev.slice(0, -1),
-                    { ...last, text: inputTranscription.text }
-                  ];
-                } else {
-                  // Start a new caller bubble
-                  return [...prev, { speaker: "caller", text: inputTranscription.text }];
-                }
-              });
-            }
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          processUserSpeech(cleanFinal);
+        }, 300);
+      }
+    };
 
-            if (outputTranscription && outputTranscription.text) {
-              setTranscript((prev) => {
-                const last = prev[prev.length - 1];
-                if (last && last.speaker === "sam") {
-                  return [
-                    ...prev.slice(0, -1),
-                    { ...last, text: last.text + outputTranscription.text }
-                  ];
-                } else {
-                  return [...prev, { speaker: "sam", text: outputTranscription.text }];
-                }
-              });
-            }
-          }
-        } catch (e) {
-          console.error("Error processing websocket message", e);
+    rec.onerror = (e: any) => {
+      if (e.error !== "no-speech" && e.error !== "aborted") {
+        console.warn("[VoiceWidget] Speech recognition error:", e.error);
+      }
+    };
+
+    rec.onend = () => {
+      if (!isAliveRef.current) return;
+      if (isSpeakingRef.current) return;
+
+      setTimeout(() => {
+        if (isAliveRef.current && recognitionRef.current === rec && !isSpeakingRef.current) {
+          try {
+            rec.start();
+          } catch (_) {}
         }
-      };
+      }, 150);
+    };
 
-      ws.onclose = (event) => {
-        console.log("WebSocket connection closed:", event);
-        
-        // Log to transcript if it closed during connection setup
-        setTranscript((prev) => {
-          return [
-            ...prev,
-            {
-              speaker: "system",
-              text: "⚠️ Your demo is expired."
-            }
-          ];
-        });
-        
-        disconnectCall();
-      };
-
-      ws.onerror = (e) => {
-        console.error("WebSocket error:", e);
-        setTranscript((prev) => [
-          ...prev,
-          {
-            speaker: "system",
-            text: "⚠️ Your demo is expired."
-          }
-        ]);
-        disconnectCall();
-      };
-
-    } catch (e: any) {
-      console.error("Failed to acquire stream or connect", e);
-      setSessionState("disconnected");
-      setTranscript((prev) => [
-        ...prev,
-        {
-          speaker: "system",
-          text: "❌ Your demo is expired."
-        }
-      ]);
+    try {
+      rec.start();
+      setStatusText("Listening...");
+    } catch (err) {
+      console.warn("[VoiceWidget] Speech recognition start error:", err);
     }
   };
 
-  // Disconnect call
-  const disconnectCall = (reason?: "ended" | "disconnected") => {
-    cleanupAudioAndWS();
-    setUserVolume(0);
-    setAiVolume(0);
-
-    if (reason === "ended" || sessionState === "connected") {
-      setSessionState("ended");
-      localStorage.setItem("sam_voice_agent_used", "true");
-    } else {
-      setSessionState("disconnected");
+  // ─── Start Call ──────────────────────────────────────────────────────────────
+  const startCall = async () => {
+    const unlocked = localStorage.getItem("voice_agent_unlocked") === "true";
+    if (!unlocked) {
+      setIsUnlocked(false);
+      setIsOpen(true);
+      scrollToForm();
+      return;
     }
+
+    localStorage.removeItem("sam_voice_agent_used");
+    stopAll();
+
+    isAliveRef.current = true;
+    isMutedRef.current = false;
+    lastProcessedPhraseRef.current = "";
+
+    const greetingText = "Hello! Welcome to Flow AI Voice Agency. I'm Sam, your 24/7 AI Desk Receptionist. How can I help you today?";
+    conversationHistoryRef.current = [
+      { role: "user", parts: [{ text: "Hello Sam" }] },
+      { role: "model", parts: [{ text: greetingText }] }
+    ];
+
+    setTranscript([{ speaker: "sam", text: greetingText }]);
+    setIsMuted(false);
+    setTimeLeft(120);
+    setSessionState("connected");
+    setStatusText("Connecting...");
+
+    // Setup Mic Audio Visualizer
+    try {
+      if (navigator.mediaDevices?.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioContextRef.current = ctx;
+        const source = ctx.createMediaStreamSource(stream);
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        analyserRef.current = analyser;
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const updateMicVol = () => {
+          if (!isAliveRef.current || !analyserRef.current) return;
+          analyserRef.current.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+          if (!isMutedRef.current) {
+            setUserVolume(Math.min(100, (sum / dataArray.length) * 2));
+          }
+          animFrameRef.current = requestAnimationFrame(updateMicVol);
+        };
+        updateMicVol();
+      }
+    } catch (micErr) {
+      console.warn("[VoiceWidget] Mic audio meter setup warning:", micErr);
+    }
+
+    startSpeechRecognition();
+    speakText(greetingText);
   };
 
+  const sendTextMessage = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || !isAliveRef.current) return;
 
+    setTextInput("");
+    setTranscript((prev) => [...prev, { speaker: "caller", text: trimmed }]);
+    await processUserSpeech(trimmed);
+  };
 
-  // Format seconds to MM:SS
+  const endCall = () => {
+    stopAll();
+    setSessionState("idle");
+  };
+
+  const toggleMute = () => {
+    const next = !isMuted;
+    setIsMuted(next);
+    isMutedRef.current = next;
+    if (next) setUserVolume(0);
+  };
+
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Calculate active scale for the avatar
-  const activeVolume = Math.max(userVolume * 1.5, aiVolume / 1.5);
-  const avatarScale = 1 + Math.min(0.6, activeVolume / 100);
+  const activeVol = Math.max(userVolume, aiVolume);
+  const avatarScale = 1 + Math.min(0.5, activeVol / 100);
 
+  // ─── Render UI ───────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Floating Toggle Button */}
-      <div className={`fixed bottom-6 right-6 z-[90] ${(!isOpen && sessionState !== "connected" && sessionState !== "connecting") ? "animate-float-gentle" : ""}`}>
+      {/* Floating Call Button */}
+      <div className={`fixed bottom-6 right-6 z-[90] ${
+        !isOpen && sessionState !== "connected" && sessionState !== "connecting" ? "animate-float-gentle" : ""
+      }`}>
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={`relative group w-14 h-14 rounded-full flex items-center justify-center text-white shadow-xl transition-all duration-300 transform hover:scale-105 ${
@@ -523,28 +540,23 @@ export default function VoiceWidget({
               : "bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-600 shadow-brand-500/25"
           }`}
         >
-          {sessionState === "connected" || sessionState === "connecting" ? (
-            <PhoneOff className="w-6 h-6 animate-pulse" />
-          ) : (
-            <Phone className="w-6 h-6" />
-          )}
+          {sessionState === "connected" || sessionState === "connecting"
+            ? <PhoneOff className="w-6 h-6 animate-pulse" />
+            : <Phone className="w-6 h-6" />}
 
-          {/* Continuous Ripple Waves while inactive and closed */}
           {!isOpen && sessionState !== "connected" && sessionState !== "connecting" && (
             <>
-              <span className="absolute inset-0 rounded-full border border-brand-500/50 animate-ripple pointer-events-none"></span>
-              <span className="absolute inset-0 rounded-full border border-brand-400/40 animate-ripple-delayed pointer-events-none"></span>
+              <span className="absolute inset-0 rounded-full border border-brand-500/50 animate-ripple pointer-events-none" />
+              <span className="absolute inset-0 rounded-full border border-brand-400/40 animate-ripple-delayed pointer-events-none" />
             </>
           )}
-
-          {/* Pulse Rings */}
           {(sessionState === "connected" || sessionState === "connecting") && (
-            <span className="absolute -inset-1 rounded-full border-2 border-red-500 animate-ping opacity-60"></span>
+            <span className="absolute -inset-1 rounded-full border-2 border-red-500 animate-ping opacity-60" />
           )}
         </button>
       </div>
 
-      {/* Floating Chat Panel */}
+      {/* Main Voice Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -556,53 +568,59 @@ export default function VoiceWidget({
           >
             {/* Header */}
             <div className="px-5 py-4 bg-slate-950/60 border-b border-slate-800 flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                {/* Avatar Icon */}
-                <div className="relative w-8 h-8 rounded-full bg-brand-950 border border-brand-800 flex items-center justify-center text-brand-400 font-mono text-sm font-semibold">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="relative shrink-0 w-8 h-8 rounded-full bg-brand-950 border border-brand-800 flex items-center justify-center text-brand-400 font-mono text-sm font-semibold">
                   S
                   {sessionState === "connected" && (
-                    <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-950"></span>
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-slate-950" />
                   )}
                 </div>
-                <div>
-                  <h3 className="text-xs font-semibold text-white tracking-wide">Sam (AI Voice Desk)</h3>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-semibold text-white tracking-wide truncate flex items-center gap-1.5">
+                    Sam — AI Voice Desk
+                  </h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {sessionState === "idle" && (
-                      <span className="text-[10px] text-slate-500">Call Ready</span>
+                      <span className="text-[10px] text-slate-400 font-mono">Gemini 2.5 Flash Engine</span>
                     )}
                     {sessionState === "connecting" && (
                       <>
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                         <span className="text-[10px] text-amber-400 font-mono">Connecting...</span>
                       </>
                     )}
                     {sessionState === "connected" && (
                       <>
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                        <span className="text-[10px] text-emerald-400 font-mono">Connected</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                        <span className="text-[10px] text-emerald-400 font-mono truncate">
+                          Gemini 2.5 Flash · Active
+                        </span>
                       </>
                     )}
-                    {(sessionState === "ended" || sessionState === "trial_used" || sessionState === "disconnected") && (
+                    {(sessionState === "ended" || sessionState === "trial_used") && (
                       <span className="text-[10px] text-red-400 font-mono">Call Ended</span>
                     )}
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-white transition-colors"
-              >
+              <button onClick={() => setIsOpen(false)} className="shrink-0 text-slate-400 hover:text-white transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Conversation Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col bg-slate-950/20">
-              {/* Dynamic Animated Avatar in Center when starting/idle/connecting */}
+            {/* Content / Chat Area */}
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-slate-950/20">
+              {/* API Error Notification */}
+              {apiErrorMsg && (
+                <div className="mb-2 p-2 bg-red-950/80 border border-red-800 text-red-300 text-[11px] font-mono rounded-lg">
+                  ⚠️ {apiErrorMsg}
+                </div>
+              )}
+
+              {/* Avatar Visualization */}
               {(sessionState === "idle" || sessionState === "connecting" || sessionState === "connected") && (
-                <div className="py-6 flex flex-col items-center justify-center gap-3 border-b border-slate-900/60">
+                <div className="py-5 flex flex-col items-center justify-center gap-3 border-b border-slate-900/60 shrink-0">
                   <div className="relative w-20 h-20 flex items-center justify-center">
-                    {/* Pulsing visual circles */}
                     <div
                       className="absolute w-16 h-16 rounded-full bg-brand-500/10 border border-brand-500/20 transition-all duration-75"
                       style={{ transform: `scale(${avatarScale * 1.25})` }}
@@ -612,146 +630,172 @@ export default function VoiceWidget({
                       style={{ transform: `scale(${avatarScale})` }}
                     />
                     <div className="absolute w-8 h-8 rounded-full bg-brand-600/60 border border-brand-400 flex items-center justify-center text-white">
-                      <Phone className="w-4 h-4" />
+                      {statusText.includes("Speaking") ? (
+                        <Volume2 className="w-4 h-4 animate-pulse" />
+                      ) : (
+                        <Phone className="w-4 h-4" />
+                      )}
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-500 tracking-widest uppercase">
-                    {sessionState === "connected" ? "Listening / Speaking" : "Standby"}
-                  </span>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span className="text-[10px] font-mono text-slate-300 tracking-widest uppercase flex items-center gap-1.5">
+                      {isMuted ? (
+                        "Mic Muted"
+                      ) : (
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-ping" />
+                          {statusText}
+                        </>
+                      )}
+                    </span>
+                    {activeVoiceName && sessionState === "connected" && (
+                      <span className="text-[9px] font-mono text-brand-400/80 truncate max-w-[220px]">
+                        Voice: {activeVoiceName}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Chat Log */}
-              <div className="space-y-3 flex-1">
-                {transcript.map((msg, index) => {
-                  if (msg.speaker === "sam") {
-                    return (
-                      <div key={index} className="flex gap-2 items-start">
-                        <div className="w-5 h-5 rounded bg-brand-600 text-white flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">
-                          S
-                        </div>
-                        <div className="bg-slate-800/80 border border-slate-750 text-slate-100 px-3 py-2 rounded-xl rounded-tl-none text-xs leading-relaxed max-w-[85%]">
-                          {msg.text}
-                        </div>
+              {/* Chat Messages */}
+              <div className="space-y-3 flex-1 mt-3">
+                {transcript.map((msg, i) => {
+                  if (msg.speaker === "sam") return (
+                    <div key={i} className="flex gap-2 items-start">
+                      <div className="w-5 h-5 rounded bg-brand-600 text-white flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">S</div>
+                      <div className="bg-slate-800/80 border border-slate-700 text-slate-100 px-3 py-2 rounded-xl rounded-tl-none text-xs leading-relaxed max-w-[85%]">
+                        {msg.text}
                       </div>
-                    );
-                  } else if (msg.speaker === "caller") {
-                    return (
-                      <div key={index} className="flex gap-2 items-start justify-end">
-                        <div className="bg-brand-950/40 border border-brand-900/50 text-slate-100 px-3 py-2 rounded-xl rounded-tr-none text-xs leading-relaxed max-w-[85%]">
-                          {msg.text}
-                        </div>
-                        <div className="w-5 h-5 rounded bg-slate-800 text-slate-300 flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">
-                          Y
-                        </div>
+                    </div>
+                  );
+                  if (msg.speaker === "caller") return (
+                    <div key={i} className="flex gap-2 items-start justify-end">
+                      <div className="bg-brand-950/40 border border-brand-900/50 text-slate-100 px-3 py-2 rounded-xl rounded-tr-none text-xs leading-relaxed max-w-[85%]">
+                        {msg.text}
                       </div>
-                    );
-                  } else {
-                    return (
-                      <div key={index} className="bg-slate-900/65 border border-slate-850 p-2.5 rounded-lg text-center">
-                        <p className="text-[10px] font-mono text-slate-400 leading-normal whitespace-pre-wrap">
-                          {msg.text}
-                        </p>
-                      </div>
-                    );
-                  }
+                      <div className="w-5 h-5 rounded bg-slate-800 text-slate-300 flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">Y</div>
+                    </div>
+                  );
+                  return (
+                    <div key={i} className="bg-slate-900/65 border border-slate-800 p-2.5 rounded-lg text-center">
+                      <p className="text-[10px] font-mono text-slate-400 leading-normal">{msg.text}</p>
+                    </div>
+                  );
                 })}
+
+                {/* Interim live transcript as user speaks */}
+                {interimUserText && (
+                  <div className="flex gap-2 items-start justify-end opacity-75">
+                    <div className="bg-brand-950/30 border border-brand-800/40 text-brand-200 px-3 py-2 rounded-xl rounded-tr-none text-xs leading-relaxed max-w-[85%] font-mono italic">
+                      {interimUserText}...
+                    </div>
+                    <div className="w-5 h-5 rounded bg-slate-800 text-slate-400 flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">Y</div>
+                  </div>
+                )}
+
+                {/* Thinking indicator */}
+                {statusText === "Thinking..." && (
+                  <div className="flex gap-2 items-start">
+                    <div className="w-5 h-5 rounded bg-brand-600 text-white flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">S</div>
+                    <div className="bg-slate-800/80 border border-slate-700 px-3 py-2 rounded-xl rounded-tl-none text-xs leading-relaxed">
+                      <span className="text-brand-300 font-mono text-[11px] animate-pulse">Thinking...</span>
+                    </div>
+                  </div>
+                )}
                 <div ref={chatEndRef} />
               </div>
             </div>
 
-            {/* Actions & Status Block */}
-            <div className="p-4 bg-slate-950 border-t border-slate-800 flex flex-col items-center gap-3">
-              {/* Idle or Disconnected state Call Trigger */}
-              {(sessionState === "idle" || sessionState === "disconnected") && (
-                <div className="w-full flex flex-col items-center gap-2 text-center">
-                  {sessionState === "disconnected" && (
-                    <div className="flex items-center gap-1.5 text-red-400 font-mono text-[10px] mb-1">
-                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                      <span>Your demo is expired</span>
+            {/* Bottom Actions */}
+            <div className="p-4 bg-slate-950 border-t border-slate-800 flex flex-col items-center gap-3 shrink-0">
+              {!isUnlocked ? (
+                <div className="w-full flex flex-col items-center gap-2.5 text-center p-1">
+                  <div className="flex items-center gap-1.5 text-amber-400 font-mono text-[11px] font-bold uppercase tracking-wider">
+                    <Lock className="w-4 h-4 animate-pulse" /><span>Inquiry Form Required</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 leading-relaxed max-w-[270px]">
+                    To test Sam AI Voice Receptionist live, please fill out the inquiry form. Details will be sent to{" "}
+                    <strong className="text-brand-300 font-mono">kuldeepbopche0@gmail.com</strong> and activate your test call!
+                  </p>
+                  <button
+                    onClick={scrollToForm}
+                    className="w-full py-3 bg-gradient-to-r from-amber-500 to-brand-600 hover:from-amber-400 hover:to-brand-500 text-white font-semibold text-xs rounded-xl shadow-lg font-mono flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <Lock className="w-4 h-4" /> Complete Form to Unlock Test →
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {(sessionState === "idle" || sessionState === "ended" || sessionState === "trial_used") && (
+                    <div className="w-full flex flex-col items-center gap-2 text-center">
+                      <p className="text-xs text-slate-400 max-w-[280px]">
+                        Ring Sam now — powered by Gemini 2.5 Flash Engine.
+                      </p>
+                      <button
+                        onClick={startCall}
+                        className="w-full py-3 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-semibold text-xs rounded-xl shadow-lg shadow-sky-500/20 flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer font-mono"
+                      >
+                        <Phone className="w-4 h-4 fill-current" /> Call Sam (Start Voice Call)
+                      </button>
                     </div>
                   )}
-                  <p className="text-xs text-slate-400 max-w-[280px]">
-                    {sessionState === "disconnected" 
-                      ? "Please book a demo call to get full access." 
-                      : "Ring Sam now to test our fully autonomous 24/7 AI Desk Receptionist."}
-                  </p>
-                  <button
-                    onClick={startCall}
-                    className="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-brand-600/15 flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all duration-300"
-                  >
-                    <Phone className="w-4 h-4 fill-current" /> {sessionState === "disconnected" ? "Retry Call" : "Call Sam"}
-                  </button>
 
-                </div>
-              )}
+                  {(sessionState === "connecting" || sessionState === "connected") && (
+                    <div className="w-full flex flex-col items-center gap-2.5">
+                      <div className="flex items-center justify-between w-full px-1">
+                        <div className="flex items-center gap-1.5 text-slate-500 font-mono text-[10px]">
+                          <Clock className="w-3.5 h-3.5 text-slate-600" />
+                          <span>{formatTime(timeLeft)} / 02:00 limit</span>
+                        </div>
+                        {sessionState === "connected" && (
+                          <span className="text-[9px] font-mono text-emerald-400 uppercase tracking-wider font-semibold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" /> Call Active
+                          </span>
+                        )}
+                      </div>
 
-              {/* Connecting / Connected Active Call UI */}
-              {(sessionState === "connecting" || sessionState === "connected") && (
-                <div className="w-full flex flex-col items-center gap-2">
-                  <div className="flex items-center justify-between w-full px-1">
-                    {/* Credit saving countdown timer (subtle, small) */}
-                    <div className="flex items-center gap-1.5 text-slate-500 font-mono text-[10px]">
-                      <Clock className="w-3.5 h-3.5 text-slate-600" />
-                      <span>{formatTime(timeLeft)} / 02:00 limit</span>
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          sendTextMessage(textInput);
+                        }}
+                        className="flex items-center gap-2 w-full"
+                      >
+                        <button
+                          type="button"
+                          onClick={toggleMute}
+                          className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                            isMuted
+                              ? "bg-red-600/80 hover:bg-red-600 text-white"
+                              : "bg-slate-800 hover:bg-slate-700 text-slate-400"
+                          }`}
+                        >
+                          {isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                        </button>
+                        <input
+                          type="text"
+                          value={textInput}
+                          onChange={(e) => setTextInput(e.target.value)}
+                          placeholder="Speak into mic or type here..."
+                          className="flex-1 bg-slate-900 border border-slate-700 text-slate-100 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-brand-500 font-mono"
+                        />
+                        <button
+                          type="submit"
+                          className="bg-brand-600 hover:bg-brand-500 text-white text-xs px-3 py-2.5 rounded-xl font-mono flex items-center gap-1 cursor-pointer transition-all shrink-0"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                        </button>
+                      </form>
+
+                      <button
+                        onClick={endCall}
+                        className="w-full py-2.5 bg-red-600/90 hover:bg-red-600 text-white font-semibold text-xs rounded-xl shadow-lg flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer font-mono"
+                      >
+                        <PhoneOff className="w-4 h-4 fill-current" /> End Call
+                      </button>
                     </div>
-                    {sessionState === "connected" && (
-                      <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wider">
-                        Credit Saver Active
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => disconnectCall()}
-                    className="w-full py-3 bg-red-650 hover:bg-red-650/90 text-white font-semibold text-xs rounded-xl shadow-lg flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-all duration-300"
-                  >
-                    <PhoneOff className="w-4 h-4 fill-current" /> End Call
-                  </button>
-                </div>
-              )}
-
-              {/* Call ended (due to timer limit) or general end */}
-              {sessionState === "ended" && (
-                <div className="w-full flex flex-col items-center gap-3 text-center">
-                  <div className="flex items-center gap-1 text-red-400 font-mono text-xs font-semibold">
-                    <AlertTriangle className="w-4 h-4" />
-                    <span>Trial Session Ended</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 max-w-[260px] leading-relaxed">
-                    Your 2-minute demo session has ended to save API credits. To get Sam working full-time for your business, book a call.
-                  </p>
-                  <a
-                    href="https://calendly.com/kuldipbopche3/30min"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 bg-brand-650 hover:bg-brand-550 text-white font-semibold text-xs rounded-xl text-center shadow-lg transition-all"
-                  >
-                    📅 Book a Demo Call
-                  </a>
-
-                </div>
-              )}
-
-              {/* Subsequent visit trial used banner */}
-              {sessionState === "trial_used" && (
-                <div className="w-full flex flex-col items-center gap-3 text-center">
-                  <div className="flex items-center gap-1.5 text-brand-400 font-mono text-xs font-semibold">
-                    <Clock className="w-4 h-4" />
-                    <span>Trial Already Used</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 max-w-[260px] leading-relaxed">
-                    You have already used your trial call with Sam. Please book a short demo call to hear Sam in action or connect with our team!
-                  </p>
-                  <a
-                    href="https://calendly.com/kuldipbopche3/30min"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl text-center shadow-lg transition-all"
-                  >
-                    📅 Book a Demo Call
-                  </a>
-
-                </div>
+                  )}
+                </>
               )}
             </div>
           </motion.div>

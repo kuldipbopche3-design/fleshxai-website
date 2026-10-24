@@ -100,7 +100,22 @@ export default function App() {
   };
 
   const handleScrollToInteractiveDemo = () => {
-    handleRingSamClick();
+    const isUnlocked = localStorage.getItem("voice_agent_unlocked") === "true";
+    if (!isUnlocked) {
+      setIsVoiceWidgetOpen(true);
+      const element = document.getElementById("ask-question-form") || document.getElementById("booking");
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY - offset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    } else {
+      handleRingSamClick();
+    }
   };
 
   return (
@@ -151,7 +166,7 @@ export default function App() {
             <FAQ />
 
             {/* L. Interactive Calendar Scheduler & Lead Capture Forms */}
-            <BookingForm />
+            <BookingForm onTestSamClick={handleRingSamClick} />
           </>
         )}
 
