@@ -171,7 +171,7 @@ export default function Footer({ onBookDemoClick, onInteractiveDemoClick, setCur
 
         {/* Legal and Copyright row */}
         <div className="pt-10 border-t border-slate-900 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-slate-600 font-mono">
-          <p>© {currentYear} Flow AI Voice Agency. All rights reserved.</p>
+          <p>© {currentYear} FlashX AI, operating as Flow AI Voice Agency. All rights reserved.</p>
           <div className="flex gap-4">
             <a href="/privacy.html" className="hover:text-slate-400 transition-colors">Privacy Policy</a>
             <span>•</span>

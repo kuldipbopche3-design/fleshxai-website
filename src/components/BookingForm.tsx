@@ -43,7 +43,8 @@ export default function BookingForm({ onTestSamClick }: BookingFormProps) {
     country: "United States",
     category: "MedSpa & Aesthetic",
     bestTime: "Morning (9:00 AM - 12:00 PM)",
-    message: ""
+    message: "",
+    smsConsent: false
   });
   const [isInquirySent, setIsInquirySent] = useState(false);
 
@@ -120,6 +121,8 @@ export default function BookingForm({ onTestSamClick }: BookingFormProps) {
           category: inquiryData.category,
           bestTimeToConnect: inquiryData.bestTime,
           instructions: inquiryData.message,
+          smsConsent: inquiryData.smsConsent ? "Yes (Opted-in via website checkbox)" : "No (Not opted-in)",
+          consentTimestampUTC: new Date().toISOString(),
           _subject: `New Inquiry & Voice Agent Unlock Request from ${inquiryData.name} (${inquiryData.businessName})`
         })
       });
@@ -359,7 +362,7 @@ export default function BookingForm({ onTestSamClick }: BookingFormProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {/* Phone No */}
                       <div className="space-y-1">
-                        <label className="text-[11px] text-slate-400 font-semibold uppercase font-mono tracking-wide">Phone No. *</label>
+                        <label className="text-[11px] text-slate-400 font-semibold uppercase font-mono tracking-wide">Mobile Phone Number *</label>
                         <input
                           type="tel"
                           required
@@ -450,11 +453,21 @@ export default function BookingForm({ onTestSamClick }: BookingFormProps) {
                       />
                     </div>
 
-                    {/* 10DLC Mandatory SMS Consent Disclosure */}
-                    <div className="pt-1 text-[10px] text-slate-500 leading-normal font-light">
-                      <p>
-                        By submitting this form, you consent to receive SMS notifications and customer care messages from FlashX AI / Flow AI. Consent is not a condition of purchase. Message frequency varies. Msg & data rates may apply. Reply <span className="font-mono font-bold text-slate-400">STOP</span> to cancel, <span className="font-mono font-bold text-slate-400">HELP</span> for help. Carriers are not liable for delayed or undelivered messages. View our <a href="/privacy.html" className="text-brand-400 underline hover:text-brand-300" target="_blank" rel="noreferrer">Privacy Policy</a> and <a href="/terms.html" className="text-brand-400 underline hover:text-brand-300" target="_blank" rel="noreferrer">Terms</a>.
-                      </p>
+                    {/* 10DLC Mandatory Separate Optional SMS Opt-In Checkbox */}
+                    <div className="pt-2 pb-1 text-left">
+                      <label htmlFor="sms-optin-checkbox" className="flex items-start gap-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          id="sms-optin-checkbox"
+                          name="smsConsent"
+                          checked={inquiryData.smsConsent}
+                          onChange={(e) => setInquiryData({ ...inquiryData, smsConsent: e.target.checked })}
+                          className="mt-0.5 w-4 h-4 rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-brand-500 focus:ring-offset-slate-950 cursor-pointer"
+                        />
+                        <span className="text-[10px] text-slate-400 leading-normal font-light">
+                          I agree to receive conversational and service SMS messages from <strong className="text-slate-300">FlashX AI, operating as Flow AI Voice Agency</strong>, regarding demo scheduling, appointment reminders, and customer support. Message frequency varies. Message and data rates may apply. Reply <span className="font-mono font-bold text-slate-300">STOP</span> to opt out, <span className="font-mono font-bold text-slate-300">HELP</span> for assistance. Consent is not a condition of purchase. Carriers are not liable for delayed or undelivered messages. View our <a href="/privacy.html" className="text-brand-400 underline hover:text-brand-300" target="_blank" rel="noreferrer">Privacy Policy</a> and <a href="/terms.html" className="text-brand-400 underline hover:text-brand-300" target="_blank" rel="noreferrer">Terms of Service</a>.
+                        </span>
+                      </label>
                     </div>
 
                     <button
