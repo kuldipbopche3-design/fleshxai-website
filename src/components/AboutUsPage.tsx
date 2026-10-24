@@ -181,7 +181,13 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
                   <Mail className="w-4 h-4" /> kuldipbopche3@gmail.com
                 </a>
                 <a href="tel:+918962417150" className="inline-flex items-center gap-2 text-xs text-brand-450 hover:text-brand-350 transition-colors font-mono">
-                  <PhoneCall className="w-4 h-4" /> +91 89624 17150
+                  <PhoneCall className="w-4 h-4" /> HQ Direct: +91 89624 17150 (Madhya Pradesh, India)
+                </a>
+                <a href="tel:+12136950612" className="inline-flex items-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors font-mono">
+                  <PhoneCall className="w-4 h-4" /> US Voice Demo Line: +1 (213) 695-0612
+                </a>
+                <a href="tel:+12136950612" className="inline-flex items-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 transition-colors font-mono">
+                  <PhoneCall className="w-4 h-4" /> US Voice Demo Line: +1 (213) 695-0612
                 </a>
               </div>
             </div>

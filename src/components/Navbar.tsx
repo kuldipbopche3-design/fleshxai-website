@@ -110,9 +110,9 @@ export default function Navbar({
               </div>
               <div>
                 <span className="font-display text-xl font-bold tracking-tight text-white group-hover:text-brand-200 transition-colors">
-                  Flow <span className="text-brand-500">AI</span>
+                  FlashX <span className="text-brand-500">AI</span>
                 </span>
-                <p className="text-[10px] font-mono tracking-wider text-slate-400 uppercase leading-none">Voice Automation</p>
+                <p className="text-[10px] font-mono tracking-wider text-slate-400 uppercase leading-none">Flow AI Voice Agency</p>
               </div>
             </a>
           </div>

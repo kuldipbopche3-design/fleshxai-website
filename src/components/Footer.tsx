@@ -53,7 +53,7 @@ export default function Footer({ onBookDemoClick, onInteractiveDemoClick, setCur
                 <PhoneCall className="w-4.5 h-4.5" />
               </div>
               <span className="font-display text-lg font-bold tracking-tight text-white">
-                Flow <span className="text-brand-500">AI</span>
+                FlashX <span className="text-brand-500">AI</span>
               </span>
             </a>
             
@@ -68,7 +68,11 @@ export default function Footer({ onBookDemoClick, onInteractiveDemoClick, setCur
               </p>
               <p className="flex items-center gap-2">
                 <PhoneCall className="w-3.5 h-3.5 text-brand-500" />
-                <a href="tel:+918962417150" className="hover:text-white transition-colors">+91 89624 17150</a>
+                <span>Headquarters (India): <a href="tel:+918962417150" className="hover:text-white transition-colors">+91 89624 17150</a></span>
+              </p>
+              <p className="flex items-center gap-2">
+                <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
+                <span>US Interactive Demo Line: <a href="tel:+12136950612" className="hover:text-white transition-colors">+1 (213) 695-0612</a></span>
               </p>
               <p className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-brand-500" />
