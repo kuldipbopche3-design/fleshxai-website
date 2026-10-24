@@ -48,7 +48,7 @@ export default function Comparison() {
             Transform Your Clinic's Operational DNA
           </h2>
           <p className="text-slate-400 font-light leading-relaxed max-w-2xl mx-auto">
-            Traditional answering services cost money without driving bookings. Flow AI replaces chaotic, manual overhead with fully automated, predictable clinic growth.
+            Traditional answering services cost money without driving bookings. FlashX AI replaces chaotic, manual overhead with fully automated, predictable clinic growth.
           </p>
         </div>
 
@@ -67,7 +67,7 @@ export default function Comparison() {
                   <AlertTriangle className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-display font-bold text-white text-base">Without Flow AI Voice</h4>
+                  <h4 className="font-display font-bold text-white text-base">Without FlashX AI Voice</h4>
                   <p className="text-xs text-slate-500 font-mono uppercase tracking-wider">Unpredictable Leakage & Manual Burden</p>
                 </div>
               </div>

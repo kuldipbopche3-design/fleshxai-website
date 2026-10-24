@@ -13,7 +13,7 @@ export default function CaseScenarios() {
             <Star className="w-3.5 h-3.5 fill-current text-brand-400" /> REALISTIC CASE SCENARIOS
           </span>
           <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-white">
-            How Flow AI Performs in the Real World
+            How FlashX AI Voice Systems Perform in the Real World
           </h2>
           <p className="text-slate-400 font-light leading-relaxed max-w-2xl mx-auto">
             These are typical operational scenarios modeled directly from actual medical and aesthetic practice workflows, demonstrating how we rescue leads.

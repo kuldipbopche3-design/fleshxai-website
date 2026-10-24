@@ -19,7 +19,7 @@ export default function HomeAboutPreview({ onAboutUsClick }: HomeAboutPreviewPro
             </div>
             
             <p className="text-slate-400 leading-relaxed font-light text-sm">
-              Flow AI Voice Agency was founded on a simple insight: local, high-value clinical practices lose significant revenue when calls go unanswered, yet human receptionist overhead is costly and subject to burnout.
+              FlashX AI (operating as Flow AI Voice Agency) was founded on a simple insight: local, high-value clinical practices lose significant revenue when calls go unanswered, yet human receptionist overhead is costly and subject to burnout.
             </p>
             <p className="text-slate-400 leading-relaxed font-light text-sm">
               Rather than selling generic chat templates or complex phone systems that clinics must set up themselves, we operate as a full-service, bespoke development agency. We design conversational flows, map availability boundaries, build calendar integrations, and verify latency parameters to ensure every call flows naturally.

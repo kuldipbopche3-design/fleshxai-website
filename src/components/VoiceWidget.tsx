@@ -450,7 +450,7 @@ export default function VoiceWidget({
     isMutedRef.current = false;
     lastProcessedPhraseRef.current = "";
 
-    const greetingText = "Hello! Welcome to Flow AI Voice Agency. I'm Sam, your 24/7 AI Desk Receptionist. How can I help you today?";
+    const greetingText = "Hello! Welcome to FlashX AI Voice Agency. I'm Sam, your 24/7 AI Desk Receptionist. How can I help you today?";
     conversationHistoryRef.current = [
       { role: "user", parts: [{ text: "Hello Sam" }] },
       { role: "model", parts: [{ text: greetingText }] }

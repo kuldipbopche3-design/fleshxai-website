@@ -107,7 +107,7 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-brand-950/20 via-slate-950 to-slate-950 opacity-70 pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative text-center space-y-6">
           <span className="font-mono text-xs text-brand-400 tracking-widest uppercase font-semibold bg-brand-950/40 border border-brand-850 px-3 py-1 rounded-full">
-            ABOUT FLOW AI & FOUNDER
+            ABOUT FLASHX AI (FLOW AI VOICE AGENCY) & FOUNDER
           </span>
           <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white max-w-3xl mx-auto">
             Meet the Agency Driving Clinical Automation
@@ -129,7 +129,7 @@ export default function AboutUsPage({ onBookDemoClick }: AboutUsPageProps) {
             </div>
             
             <p className="text-slate-400 leading-relaxed font-light text-sm">
-              Flow AI Voice Agency was founded on a simple insight: local, high-value clinical practices lose significant revenue when calls go unanswered, yet human receptionist overhead is costly and subject to burnout.
+              FlashX AI (operating as Flow AI Voice Agency) was founded on a simple insight: local, high-value clinical practices lose significant revenue when calls go unanswered, yet human receptionist overhead is costly and subject to burnout.
             </p>
             <p className="text-slate-400 leading-relaxed font-light text-sm">
               Rather than selling generic chat templates or complex phone systems that clinics must set up themselves, we operate as a full-service, bespoke development agency. We design conversational flows, map availability boundaries, build calendar integrations, and verify latency parameters to ensure every call flows naturally.

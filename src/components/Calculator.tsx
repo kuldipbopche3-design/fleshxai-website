@@ -32,7 +32,7 @@ export default function Calculator() {
           </h2>
           <p className="text-slate-400 font-light leading-relaxed max-w-2xl mx-auto">
             Missed calls are one of the largest silent revenue drains in modern clinics. 
-            Drag the sliders below to see how much revenue Flow AI can recover for your business.
+            Drag the sliders below to see how much revenue FlashX AI can recover for your business.
           </p>
         </div>
 

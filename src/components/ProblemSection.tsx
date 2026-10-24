@@ -27,7 +27,7 @@ export default function ProblemSection() {
       impact: "Uncaptured Late-Night Inquiries",
       description: "Around 11% of high-intent patient booking calls happen outside normal 9-to-5 operating hours. Relying on basic voicemails or cold automated forms leaves these premium spots empty.",
       icon: <AlertCircle className="w-5 h-5 text-red-400" />,
-      source: "Flow AI Deployment Call Audits (PDF)",
+      source: "FlashX AI Deployment Call Audits (PDF)",
       sourceLink: "/client_features_usUpgraded2.1.pdf"
     },
     {
