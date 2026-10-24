@@ -58,7 +58,7 @@ export const FAQs: FAQItem[] = [
   },
   {
     question: "Is patient/client data secure?",
-    answer: "Security and compliance are our absolute top priorities. Flow AI's systems are fully compliant with standard data protection protocols. All call records, transcriptions, and customer data are fully encrypted at rest and in transit. We can also configure automatic data-purging rules to align with your practice's specific retention policies."
+    answer: "Security and compliance are our absolute top priorities. FlashX AI's systems are fully compliant with standard data protection protocols. All call records, transcriptions, and customer data are fully encrypted at rest and in transit. We can also configure automatic data-purging rules to align with your practice's specific retention policies."
   },
   {
     question: "What if the AI can't handle a complex or urgent question?",
@@ -92,7 +92,7 @@ export const FEATURES: FeatureItem[] = [
   {
     title: "Missed-Call Auto-Rescue SMS",
     outcome: "Rescue Leads Before They Call Competitors",
-    description: "If your primary lines are busy and an inbound caller hangs up, Flow AI instantly shoots them a polite SMS: 'Sorry we missed your call! I can help you book right here...' with a custom reservation link.",
+    description: "If your primary lines are busy and an inbound caller hangs up, FlashX AI instantly shoots them a polite SMS: 'Sorry we missed your call! I can help you book right here...' with a custom reservation link.",
     iconName: "ShieldAlert"
   },
   {
@@ -162,7 +162,7 @@ export const ILLUSTRATIVE_SCENARIOS: ScenarioItem[] = [
     category: "AFTER-HOURS LEAD RESCUE",
     title: "The Sunday Night Laser Consult",
     problem: "A prospective patient sees a MedSpa's Instagram ad at 9:30 PM on Sunday. She calls with a quick question about chemical peel downtime. In most clinics, this goes to voicemail. She hangs up and clicks a competitor's ad instead.",
-    solution: "Flow AI answers on the first ring. Sam explains the 2-day recovery time, confirms they have an opening on Tuesday afternoon, and books her into the calendar.",
+    solution: "FlashX AI answers on the first ring. Sam explains the 2-day recovery time, confirms they have an opening on Tuesday afternoon, and books her into the calendar.",
     result: "A $650 treatment booked, confirmed, and synced before the clinic staff even opens their emails on Monday morning."
   },
   {
@@ -170,7 +170,7 @@ export const ILLUSTRATIVE_SCENARIOS: ScenarioItem[] = [
     category: "MONDAY MORNING FLOOD",
     title: "Managing the Peak Hour Overflow",
     problem: "Monday at 9:00 AM, the dental front desk is checking in 3 patients, processing insurance, and the phone is ringing constantly. Two inbound calls are missed while staff is speaking to in-person patients.",
-    solution: "Flow AI acts as the backup receptionist. After 2 rings at the front desk, the overflow calls are routed to Sam, who books a hygiene cleaning and answers a parking FAQ.",
+    solution: "FlashX AI acts as the backup receptionist. After 2 rings at the front desk, the overflow calls are routed to Sam, who books a hygiene cleaning and answers a parking FAQ.",
     result: "Zero hold times for callers, zero stress for front-desk staff, and two appointments secured that would have otherwise gone to voicemail."
   },
   {
@@ -178,7 +178,7 @@ export const ILLUSTRATIVE_SCENARIOS: ScenarioItem[] = [
     category: "FAST LEAD FOLLOW-UP",
     title: "Missed-Call Auto-Rescue",
     problem: "An active dermatology lead calls at lunch. The line is busy. They hang up immediately. Research shows 67% of callers won't leave a message; they will simply call the next listing on Google.",
-    solution: "Within 45 seconds of the call drop, Flow AI's automated SMS agent shoots a message: 'Hi! So sorry we missed you. I can help you schedule your skin check right here: [link]'.",
+    solution: "Within 45 seconds of the call drop, FlashX AI's automated SMS agent shoots a message: 'Hi! So sorry we missed you. I can help you schedule your skin check right here: [link]'.",
     result: "The lead clicks the link, answers 3 qualification questions, and books a Thursday morning spot. An otherwise lost patient rescued in under 5 minutes."
   }
 ];
